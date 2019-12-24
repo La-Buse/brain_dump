@@ -1,4 +1,4 @@
-import './project_interface.dart';
+import 'project_interface.dart';
 class Project implements ProjectInterface {
   String _name;
   Project(String name) {
