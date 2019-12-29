@@ -1,5 +1,5 @@
+import 'package:brain_dump/models/route_generator.dart';
 import 'package:flutter/material.dart';
-import 'package:brain_dump/widgets/manage_stuff.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -11,7 +11,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Home(title: 'Flutter Demo Home Page'),
+      initialRoute: '/',
+      onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }

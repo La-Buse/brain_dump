@@ -3,17 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'custom_text.dart';
 import 'package:brain_dump/bloc.dart';
 
-class Home extends StatefulWidget {
-  Home({Key key, this.title}) : super(key: key);
+class ManageStuff extends StatefulWidget {
+  ManageStuff({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
   State<StatefulWidget> createState() {
-    return new _HomeState();
+    return new _ManageStuffState();
   }
 }
 
-class _HomeState extends State<Home> {
+class _ManageStuffState extends State<ManageStuff> {
   final dumpItBloc = DumpItBloc();
 
   @override
