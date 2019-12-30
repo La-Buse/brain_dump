@@ -18,6 +18,7 @@ class InTray extends StatefulWidget {
 class _InTrayState extends State<InTray> {
   final unmanagedItemBloc = UnmanagedItemBloc();
   String newUnmanagedItemName;
+  String editedName;
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +41,20 @@ class _InTrayState extends State<InTray> {
                       UnmanagedItem item = state.getItem(i);
                       return new ListTile(
                           title: new Text(item.name),
-                          trailing: new IconButton(
+                          trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children:
+                          [
+                            new IconButton(
                               icon: new Icon(Icons.delete),
                               onPressed: () {
                                 unmanagedItemBloc.add(DeleteItemEvent(item.id));
-                              })
+                              }),
+                            new IconButton(
+                                icon: new Icon(Icons.edit),
+                                onPressed: () { editStuff(item); }
+                              ),
+                            ])
                       );
                     }),
 
@@ -57,6 +67,44 @@ class _InTrayState extends State<InTray> {
         });
   }
 
+  editStuff(UnmanagedItem item)  {
+    return showDialog(
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return new AlertDialog(
+            contentPadding: EdgeInsets.all(20.0),
+            title: new Text("Describe your stuff with 50 characters or less."),
+            content: new TextField(
+                decoration: new InputDecoration(
+                  labelText: "Description: ",
+                  hintText: item.name,
+                ),
+                onChanged: (String str) {
+                  editedName = str;
+                }),
+            actions: [
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text('Cancel')),
+              new FlatButton(
+                  onPressed: () {
+                    if (editedName != null) {
+                      item.setName(editedName);
+                      unmanagedItemBloc
+                          .add(UpdateItemEvent(item));
+                    }
+                    editedName = null;
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text('Update'))
+            ]);
+      },
+      context: context,
+    );
+  }
+
   Future<Null> addStuff() async {
     return showDialog(
       barrierDismissible: true,
@@ -65,7 +113,9 @@ class _InTrayState extends State<InTray> {
             contentPadding: EdgeInsets.all(20.0),
             title: new Text("Describe your stuff with 50 characters or less."),
             content: new TextField(
-                decoration: new InputDecoration(labelText: "Description: "),
+                decoration: new InputDecoration(
+                    labelText: "Description: ",
+                ),
                 onChanged: (String str) {
                   newUnmanagedItemName = str;
                 }),

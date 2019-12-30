@@ -56,4 +56,8 @@ class DatabaseClient {
     Database db = await database;
     return await db.delete(table, where: 'id = ?', whereArgs: [id]);
   }
+  Future<int> updateItem(UnmanagedItem item) async {
+    Database db = await database;
+    return db.update('UnmanagedItem', item.toMap(), where: 'id = ?', whereArgs: [item.id]);
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:brain_dump/models/database_client.dart';
 import 'package:brain_dump/models/unmanaged_item.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -11,6 +12,13 @@ class SaveItemEvent extends UnmanagedItemEvent {
     item.setName(name);
     DatabaseClient db = DatabaseClient();
     db.addUnmanagedItem(item);
+  }
+}
+
+class UpdateItemEvent extends UnmanagedItemEvent {
+  UpdateItemEvent(UnmanagedItem item) {
+    DatabaseClient db = DatabaseClient();
+    db.updateItem(item);
   }
 }
 

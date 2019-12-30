@@ -23,7 +23,7 @@ class UnmanagedItem {
       map['id'] = this.id;
     }
     if (this.dateCreated != null) {
-      map['date_created'] = this.dateCreated;
+      map['date_created'] = this.dateCreated.toIso8601String();
     } else {
       map['date_created'] = DateTime.now().toIso8601String();
     }
