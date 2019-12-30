@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'custom_text.dart';
-import 'package:brain_dump/bloc.dart';
+import 'package:brain_dump/blocs/workflow/bloc.dart';
 
 class ManageStuff extends StatefulWidget {
   ManageStuff({Key key, this.title}) : super(key: key);

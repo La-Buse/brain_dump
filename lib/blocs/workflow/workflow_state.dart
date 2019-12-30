@@ -1,4 +1,4 @@
-import 'package:brain_dump/bloc.dart';
+import './bloc.dart';
 import 'package:meta/meta.dart';
 
 @immutable
