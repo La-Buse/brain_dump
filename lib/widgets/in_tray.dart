@@ -1,4 +1,3 @@
-import 'package:brain_dump/models/database_client.dart';
 import 'package:brain_dump/models/unmanaged_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +29,7 @@ class _InTrayState extends State<InTray> {
           }
           return new Scaffold(
             appBar: new AppBar(
-              title: new Text("Add stuff to your in tray"),
+              title: new Text("Unmanaged items"),
             ),
             body:
                 new ListView.builder(
@@ -54,7 +53,13 @@ class _InTrayState extends State<InTray> {
                                 icon: new Icon(Icons.edit),
                                 onPressed: () { editStuff(item); }
                               ),
-                            ])
+                            ]),
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                              '/Manage stuff',
+                              arguments: item,
+                          );
+                        }
                       );
                     }),
 

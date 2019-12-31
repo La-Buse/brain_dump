@@ -10,10 +10,10 @@ class RouteGenerator {
       case '/':
         return MaterialPageRoute(builder: (_) => Home());
       case '/Manage stuff':
-        if (args is String) {
+        if (! (args is String)) {
           return MaterialPageRoute(
             builder: (_) => ManageStuff(
-              //data: args,
+              args,
             ),
           );
         }

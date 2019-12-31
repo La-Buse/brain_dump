@@ -1,11 +1,19 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:brain_dump/models/unmanaged_item.dart';
 import './bloc.dart';
 
 class DumpItBloc extends Bloc<WorkflowEvent, WorkflowState> {
+
+  UnmanagedItem item;
+
+  setItem(UnmanagedItem item) {
+    this.item = item;
+  }
+
   @override
   WorkflowState get initialState => InitialWorkflowState();
-  List<WorkflowState >_lastState = new List();
+  List<WorkflowState> _lastState = new List();
   @override
   Stream<WorkflowState> mapEventToState(
     WorkflowEvent event,

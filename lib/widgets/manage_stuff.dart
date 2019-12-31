@@ -1,20 +1,27 @@
+import 'package:brain_dump/models/unmanaged_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'custom_text.dart';
 import 'package:brain_dump/blocs/workflow/bloc.dart';
 
 class ManageStuff extends StatefulWidget {
-  ManageStuff({Key key, this.title}) : super(key: key);
+  ManageStuff(this.item, {Key key, this.title}) : super(key: key);
   final String title;
+  UnmanagedItem item;
 
   @override
   State<StatefulWidget> createState() {
-    return new _ManageStuffState();
+    return new _ManageStuffState(this.item);
   }
 }
 
 class _ManageStuffState extends State<ManageStuff> {
+  UnmanagedItem item;
   final dumpItBloc = DumpItBloc();
+  _ManageStuffState(this.item) {
+    dumpItBloc.setItem(this.item);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -27,12 +34,16 @@ class _ManageStuffState extends State<ManageStuff> {
                 automaticallyImplyLeading: false,
                 leading: IconButton(icon: Icon(Icons.arrow_back),
                 onPressed: (){
-                  dumpItBloc.add(GoBack());
+                  if (state.isInitialState()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    dumpItBloc.add(GoBack());
+                  }
                 },),
                 title: new Text("Manage your stuff"),
               ),
               body:new Center(
-                child: buildColumnWithData(context, state.getName(), state.getButtons()),
+                child: buildColumnWithData(context, state.getName(), state.getButtons(), item.name),
               )
           );
         }
@@ -40,8 +51,10 @@ class _ManageStuffState extends State<ManageStuff> {
 
   }
 
-  Column buildColumnWithData(BuildContext context, question, List<WorkflowButton> buttons) {
+  Column buildColumnWithData(BuildContext context, question, List<WorkflowButton> buttons, String stuffName) {
     List<Widget> tempWidgets = [];
+    tempWidgets.add(CustomText(stuffName));
+    tempWidgets.add(SizedBox(height:50));
     tempWidgets.add(CustomText(
       question,
       scaleFactor: 2.0,

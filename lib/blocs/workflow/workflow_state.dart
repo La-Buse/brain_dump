@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 abstract class WorkflowState {
   String getName();
   List<WorkflowButton> getButtons();
+  bool isInitialState();
 }
 
 class WorkflowButton {
@@ -17,6 +18,9 @@ class WorkflowButton {
 }
 
 class NonActionableState extends WorkflowState {
+  bool isInitialState() {
+    return false;
+  }
   String getName() {
     return "What kind of non actionable is this stuff ?";
   }
@@ -30,6 +34,9 @@ class NonActionableState extends WorkflowState {
 }
 
 class IsActionableState extends WorkflowState {
+  bool isInitialState() {
+    return false;
+  }
   String getName() {
     return "Will it take less than 2 minutes ?";
   }
@@ -42,6 +49,9 @@ class IsActionableState extends WorkflowState {
 }
 
 class DelegateOrDeferState extends WorkflowState {
+  bool isInitialState() {
+    return false;
+  }
   String getName() {
     return "Do you want to delegate it or defer it ?";
   }
@@ -54,6 +64,9 @@ class DelegateOrDeferState extends WorkflowState {
 }
 
 class DoItNowState extends WorkflowState {
+  bool isInitialState() {
+    return false;
+  }
   String getName() {
     return "Do it now.";
   }
@@ -64,6 +77,9 @@ class DoItNowState extends WorkflowState {
 }
 
 class InitialWorkflowState extends WorkflowState {
+  bool isInitialState() {
+    return true;
+  }
   String getName() {
     return "Is this stuff actionable ?";
   }
@@ -76,6 +92,9 @@ class InitialWorkflowState extends WorkflowState {
 }
 
 class FinalDumpItState extends WorkflowState {
+  bool isInitialState() {
+    return false;
+  }
   String getName() {
     return "Congratulations, you have successfully dealt with some of your stuff !";
   }
@@ -85,6 +104,9 @@ class FinalDumpItState extends WorkflowState {
 }
 
 class WaitForItState extends WorkflowState {
+  bool isInitialState() {
+    return false;
+  }
   String getName() {
     return "Write down the name and contact of the person you are waiting for and take a note of the date.";
   }
@@ -94,6 +116,9 @@ class WaitForItState extends WorkflowState {
 }
 
 class CalendarOrNextActionsState extends WorkflowState {
+  bool isInitialState() {
+    return false;
+  }
   String getName() {
     return "Does this action have to be done at a specific time (Calendar) or ASAP (Next actions list) ? ";
   }

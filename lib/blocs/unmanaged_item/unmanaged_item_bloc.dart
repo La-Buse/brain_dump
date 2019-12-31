@@ -12,7 +12,7 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
   Stream<UnmanagedItemState> mapEventToState(
     UnmanagedItemEvent event,
   ) async* {
-    UnmanagedItemState state = InitialUnmanagedItemState();
+        UnmanagedItemState state = InitialUnmanagedItemState();
         await state.initializeItems();
         yield state;
   }
