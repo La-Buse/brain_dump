@@ -11,9 +11,11 @@ abstract class WorkflowState {
 class WorkflowButton {
   String name;
   WorkflowEvent nextEvent;
-  WorkflowButton(String name, WorkflowEvent nextEvent) {
+  String nextPageName;
+  WorkflowButton(String name, WorkflowEvent nextEvent, {nextPageName: '/'}) {
     this.name = name;
     this.nextEvent = nextEvent;
+    this.nextPageName = nextPageName;
   }
 }
 
@@ -124,8 +126,8 @@ class CalendarOrNextActionsState extends WorkflowState {
   }
   List<WorkflowButton> getButtons() {
     return [
-      new WorkflowButton("Calendar", Calendar()),
-      new WorkflowButton("Next Actions", NextActions()),
+      new WorkflowButton("Calendar", null, nextPageName: '/Unmanaged'),
+      new WorkflowButton("Next Actions", null, nextPageName: '/Unmanaged'),
     ];
   }
 }

@@ -8,19 +8,24 @@ class RouteGenerator {
     final args = settings.arguments;
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => Home());
+        return MaterialPageRoute(
+            builder: (_) => Home(),
+            settings: RouteSettings(name: '/')
+        );
       case '/Manage stuff':
         if (! (args is String)) {
           return MaterialPageRoute(
             builder: (_) => ManageStuff(
               args,
             ),
+            settings: RouteSettings(name: '/Manage stuff')
           );
         }
         break;
-      case '/In tray':
+      case '/Unmanaged':
         return MaterialPageRoute(
           builder: (_) => InTray(),
+            settings: RouteSettings(name: '/Unmanaged')
         );
       default:
         break;

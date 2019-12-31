@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'custom_text.dart';
 import 'package:brain_dump/blocs/workflow/bloc.dart';
+import 'package:brain_dump/widgets/in_tray.dart';
 
 class ManageStuff extends StatefulWidget {
   ManageStuff(this.item, {Key key, this.title}) : super(key: key);
@@ -43,7 +44,7 @@ class _ManageStuffState extends State<ManageStuff> {
                 title: new Text("Manage your stuff"),
               ),
               body:new Center(
-                child: buildColumnWithData(context, state.getName(), state.getButtons(), item.name),
+                child: buildColumnWithData(context, state.getName(), state.getButtons(), ''),
               )
           );
         }
@@ -62,7 +63,19 @@ class _ManageStuffState extends State<ManageStuff> {
     for (int i = 0; i < buttons.length; i++) {
       WorkflowButton current = buttons[i];
       tempWidgets.add(customButton(current.name, () {
-        dumpItBloc.add(current.nextEvent);
+        if (current.nextEvent != null) {
+          dumpItBloc.add(current.nextEvent);
+        } else {
+          //Navigator.of(context).pushNamed(current.nextPageName);
+          //Navigator.of(context).pushNamedAndRemoveUntil('/Unmanaged', ModalRoute.withName('/Unmanaged'));
+          Navigator.of(context).pushNamedAndRemoveUntil('/Unmanaged', (Route<dynamic> route) {
+            return route.settings.name.compareTo('/')== 0;
+
+          });
+          //Navigator.of(context).popAndPushNamed(current.nextPageName);
+          //Navigator.of(context).pushReplacementNamed(current.nextPageName);
+        }
+
       }));
     }
     return new Column(
