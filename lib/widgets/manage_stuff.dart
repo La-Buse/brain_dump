@@ -44,7 +44,7 @@ class _ManageStuffState extends State<ManageStuff> {
                 title: new Text("Manage your stuff"),
               ),
               body:new Center(
-                child: buildColumnWithData(context, state.getName(), state.getButtons(), ''),
+                child: buildColumnWithData(context, state.getName(), state.getButtons(), item.name),
               )
           );
         }
@@ -66,14 +66,9 @@ class _ManageStuffState extends State<ManageStuff> {
         if (current.nextEvent != null) {
           dumpItBloc.add(current.nextEvent);
         } else {
-          //Navigator.of(context).pushNamed(current.nextPageName);
-          //Navigator.of(context).pushNamedAndRemoveUntil('/Unmanaged', ModalRoute.withName('/Unmanaged'));
-          Navigator.of(context).pushNamedAndRemoveUntil('/Unmanaged', (Route<dynamic> route) {
-            return route.settings.name.compareTo('/')== 0;
-
-          });
-          //Navigator.of(context).popAndPushNamed(current.nextPageName);
-          //Navigator.of(context).pushReplacementNamed(current.nextPageName);
+          Navigator.of(context).pushNamedAndRemoveUntil(current.nextPageName, (Route<dynamic> route) {
+            return route.settings.name.compareTo('/') == 0;
+          }, arguments: item);
         }
 
       }));
