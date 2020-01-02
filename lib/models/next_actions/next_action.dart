@@ -1,9 +1,26 @@
-class NextAction {
+import 'package:brain_dump/models/next_actions/next_action_interface.dart';
+import 'package:brain_dump/models/database_client.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:async/async.dart';
+final  dbTableName = 'NextAction';
+
+class NextAction extends NextActionInterface {
   int id;
   int parentId;
   String name;
   DateTime dateCreated;
   DateTime dateAccomplished;
+
+  static Future<int> addNextActionToDb(NextAction action) async {
+    Database db = await DatabaseClient().database;
+    action.id = await db.insert(dbTableName, action.toMap());
+    return action.id;
+  }
+
+  static Future<int> deleteNextAction(int id) async {
+    Database db = await DatabaseClient().database;
+    return await db.delete(dbTableName, where: 'id = ?', whereArgs: [id]);
+  }
 
   fromMap(Map<String, dynamic> map) {
     this.id = map['id'];
@@ -36,5 +53,9 @@ class NextAction {
       map['parent_id'] = this.parentId;
     }
     return map;
+  }
+
+  bool isContext() {
+    return false;
   }
 }

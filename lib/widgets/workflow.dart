@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'custom_text.dart';
 import 'package:brain_dump/blocs/workflow/bloc.dart';
-import 'package:brain_dump/widgets/in_tray.dart';
+import 'package:brain_dump/widgets/unmanaged.dart';
 
 class ManageStuff extends StatefulWidget {
   ManageStuff(this.item, {Key key, this.title}) : super(key: key);
@@ -18,16 +18,16 @@ class ManageStuff extends StatefulWidget {
 
 class _ManageStuffState extends State<ManageStuff> {
   UnmanagedItem item;
-  final dumpItBloc = DumpItBloc();
+  final workflowBloc = WorkflowBloc();
   _ManageStuffState(this.item) {
-    dumpItBloc.setItem(this.item);
+    workflowBloc.setItem(this.item);
   }
 
 
   @override
   Widget build(BuildContext context) {
     return new BlocBuilder(
-      bloc: dumpItBloc,
+      bloc: workflowBloc,
         builder: (BuildContext context, WorkflowState state) {
 
         return Scaffold(
@@ -38,7 +38,7 @@ class _ManageStuffState extends State<ManageStuff> {
                   if (state.isInitialState()) {
                     Navigator.of(context).pop();
                   } else {
-                    dumpItBloc.add(GoBack());
+                    workflowBloc.add(GoBack());
                   }
                 },),
                 title: new Text("Manage your stuff"),
@@ -64,7 +64,7 @@ class _ManageStuffState extends State<ManageStuff> {
       WorkflowButton current = buttons[i];
       tempWidgets.add(customButton(current.name, () {
         if (current.nextEvent != null) {
-          dumpItBloc.add(current.nextEvent);
+          workflowBloc.add(current.nextEvent);
         } else {
           Navigator.of(context).pushNamedAndRemoveUntil(current.nextPageName, (Route<dynamic> route) {
             return route.settings.name.compareTo('/') == 0;
@@ -82,7 +82,7 @@ class _ManageStuffState extends State<ManageStuff> {
   @override
   void dispose() {
     super.dispose();
-    dumpItBloc.close();
+    workflowBloc.close();
   }
 }
 

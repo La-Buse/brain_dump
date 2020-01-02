@@ -32,6 +32,22 @@ class DatabaseClient {
         name TEXT NOT NULL,
         date_created TEXT NOT NULL)
     ''');
+    await db.execute('''
+        CREATE TABLE NextAction (
+        id INTEGER PRIMARY KEY,
+        parent_id  INTEGER,
+        name TEXT NOT NULL,
+        date_created TEXT NOT NULL,
+        date_accomplished TEXT NOT NULL)
+    ''');
+    await db.execute('''
+        CREATE TABLE NextActionContext (
+        id INTEGER PRIMARY KEY,
+        parent_id  INTEGER,
+        name TEXT NOT NULL,
+        date_created TEXT NOT NULL,
+        date_accomplished TEXT NOT NULL)
+    ''');
   }
 
   Future<UnmanagedItem> addUnmanagedItem(UnmanagedItem item) async {
@@ -60,4 +76,5 @@ class DatabaseClient {
     Database db = await database;
     return db.update('UnmanagedItem', item.toMap(), where: 'id = ?', whereArgs: [item.id]);
   }
+
 }

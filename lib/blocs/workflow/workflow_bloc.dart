@@ -3,7 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:brain_dump/models/unmanaged_item.dart';
 import './bloc.dart';
 
-class DumpItBloc extends Bloc<WorkflowEvent, WorkflowState> {
+class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
 
   UnmanagedItem item;
 

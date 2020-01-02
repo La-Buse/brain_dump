@@ -1,7 +1,7 @@
-import 'package:brain_dump/widgets/manage_stuff.dart';
+import 'package:brain_dump/widgets/workflow.dart';
 import 'package:flutter/material.dart';
 import 'package:brain_dump/widgets/home.dart';
-import 'package:brain_dump/widgets/in_tray.dart';
+import 'package:brain_dump/widgets/unmanaged.dart';
 import 'package:brain_dump/widgets/next_actions.dart';
 
 class RouteGenerator {
@@ -29,10 +29,10 @@ class RouteGenerator {
             settings: RouteSettings(name: '/Unmanaged')
         );
         break;
-      case 'Next Actions':
+      case '/Next Actions':
         return MaterialPageRoute(
           builder: (_) => NextActions(),
-          settings: RouteSettings(name: 'Next Actions')
+          settings: RouteSettings(name: '/Next Actions')
         );
       default:
         break;
