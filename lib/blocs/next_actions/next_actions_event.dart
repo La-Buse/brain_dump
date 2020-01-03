@@ -1,3 +1,4 @@
+import 'package:brain_dump/models/next_actions/next_action.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -15,8 +16,7 @@ class AddContextEvent extends NextActionsEvent {
 }
 
 class AddActionEvent extends NextActionsEvent {
-  AddActionEvent(String actionName, String contextName, int parentId):
-        super(actionName: actionName, contextName: contextName, parentId: parentId);
-
-
+  AddActionEvent(String actionName, String contextName, int parentId) :
+        super(
+          actionName: actionName, contextName: contextName, parentId: parentId);
 }

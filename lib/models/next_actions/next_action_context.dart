@@ -10,6 +10,20 @@ class NextActionContext extends NextActionInterface {
   String name;
   DateTime dateCreated;
 
+  static Future<List<NextActionContext>> readContextsFromDb(int parentId) async {
+    Database db = await DatabaseClient().database;
+    String queryString = 'SELECT * FROM NextActionContext' + (parentId == -1 ? '' : ' WHERE id = ?');
+    List<Object> args = parentId == -1 ? [] : [parentId];
+    List<Map<String, dynamic>> result = await db.rawQuery(queryString, args);
+    List<NextActionContext> contexts = [];
+    result.forEach((map) {
+      NextActionContext nextAction = new NextActionContext();
+      nextAction.fromMap(map);
+      contexts.add(nextAction);
+    });
+    return contexts;
+  }
+
   static Future<int> addActionContext(NextActionContext context) async {
     Database db = await DatabaseClient().database;
     context.id = await db.insert(dbTableName, context.toMap());

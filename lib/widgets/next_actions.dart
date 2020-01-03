@@ -19,12 +19,11 @@ class _NextActionsState extends State<NextActions> {
   final nextActionsBloc = NextActionsBloc();
   final tooltipMessage = '''Action : The next physical action that will 
 bring you closer to the completion of a task. 
-Good: Call Gary about merger meeting. Bad: Plan merger.
+Good: Call Gary to set merger meeting. Bad: Plan merger.
 
 Context: context in which next actions will be easily done. Example: At home, at computer, errands, etc.
 ''';
   final popUpOptions = ['Add action', 'Add context'];
-  //final popUpOptions = ['Add action', 'Add context'];
   final key = new GlobalKey();
   String newNextActionName = '';
   @override
@@ -53,19 +52,14 @@ Context: context in which next actions will be easily done. Example: At home, at
                     if (optionSelected.compareTo(popUpOptions[0]) == 0) {
                       addNextAction(state.getParentId());
                     } else {
-
+                      addActionContext(state.getParentId());
                     }
                   },
                   itemBuilder: (BuildContext context) {
                     return popUpOptions.map((String choice) {
                       return PopupMenuItem<String>(
                         value: choice,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(choice),
-                          ],
-                        ),
+                        child: Text(choice),
                       );
                     }).toList();
                   }
@@ -167,7 +161,6 @@ Context: context in which next actions will be easily done. Example: At home, at
                   child: new Text('Cancel')),
               new FlatButton(
                   onPressed: () {
-
                     if (newNextActionName != null) {
                       nextActionsBloc
                           .add(AddActionEvent(newNextActionName, '', parentId));

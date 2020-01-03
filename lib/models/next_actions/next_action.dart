@@ -11,6 +11,20 @@ class NextAction extends NextActionInterface {
   DateTime dateCreated;
   DateTime dateAccomplished;
 
+  static Future<List<NextAction>> readNextActionsFromDb(int parentId) async {
+    Database db = await DatabaseClient().database;
+    String queryString = 'SELECT * FROM NextAction' + (parentId == -1 ? '' : ' WHERE id = ?');
+    List<Object> args = parentId == -1 ? [] : [parentId];
+    List<Map<String, dynamic>> result = await db.rawQuery(queryString, args);
+    List<NextAction> actions = [];
+    result.forEach((map) {
+      NextAction nextAction = new NextAction();
+      nextAction.fromMap(map);
+      actions.add(nextAction);
+    });
+    return actions;
+  }
+
   static Future<int> addNextActionToDb(NextAction action) async {
     Database db = await DatabaseClient().database;
     action.id = await db.insert(dbTableName, action.toMap());
