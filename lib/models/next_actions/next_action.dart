@@ -13,9 +13,10 @@ class NextAction extends NextActionInterface {
 
   static Future<List<NextAction>> readNextActionsFromDb(int parentId) async {
     Database db = await DatabaseClient().database;
-    String queryString = 'SELECT * FROM NextAction' + (parentId == -1 ? '' : ' WHERE id = ?');
-    List<Object> args = parentId == -1 ? [] : [parentId];
-    List<Map<String, dynamic>> result = await db.rawQuery(queryString, args);
+    var test = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
+    String queryString = 'SELECT * FROM NextAction' + (parentId == -1 || parentId == null ? '' : ' WHERE id = ?');
+    List<Object> args = parentId == -1 || parentId == null ? [] : [parentId];
+    List<Map<String, dynamic>> result = await db.rawQuery(queryString);
     List<NextAction> actions = [];
     result.forEach((map) {
       NextAction nextAction = new NextAction();

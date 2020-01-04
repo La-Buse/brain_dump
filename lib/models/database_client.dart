@@ -1,10 +1,11 @@
-
 import 'package:brain_dump/models/unmanaged_item.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:io';
 import 'package:async/async.dart';
+
+final dbVersion = 2;
 
 class DatabaseClient {
   Database _database;
@@ -20,8 +21,9 @@ class DatabaseClient {
 
   Future<Database> create() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String databaseDirectory = join(directory.path, 'database.db');
-    var bdd = await openDatabase(databaseDirectory, version: 1, onCreate: _onCreate);
+    String databaseDirectory = join(directory.path, 'database_v' + dbVersion.toString() + '.db');
+    var bdd =
+        await openDatabase(databaseDirectory, version: dbVersion, onCreate: _onCreate);
     return bdd;
   }
 
@@ -35,7 +37,7 @@ class DatabaseClient {
     await db.execute('''
         CREATE TABLE NextAction (
         id INTEGER PRIMARY KEY,
-        parent_id  INTEGER,
+        parent_id INTEGER,
         name TEXT NOT NULL,
         date_created TEXT NOT NULL,
         date_accomplished TEXT NOT NULL)
@@ -43,7 +45,7 @@ class DatabaseClient {
     await db.execute('''
         CREATE TABLE NextActionContext (
         id INTEGER PRIMARY KEY,
-        parent_id  INTEGER,
+        parent_id INTEGER,
         name TEXT NOT NULL,
         date_created TEXT NOT NULL,
         date_accomplished TEXT NOT NULL)
@@ -58,7 +60,8 @@ class DatabaseClient {
 
   Future<List<UnmanagedItem>> readUnmanagedItems() async {
     Database myDatabase = await database;
-    List<Map<String, dynamic>> result = await myDatabase.rawQuery('SELECT * FROM UnmanagedItem');
+    List<Map<String, dynamic>> result =
+        await myDatabase.rawQuery('SELECT * FROM UnmanagedItem');
     List<UnmanagedItem> items = [];
     result.forEach((map) {
       UnmanagedItem item = new UnmanagedItem();
@@ -72,9 +75,10 @@ class DatabaseClient {
     Database db = await database;
     return await db.delete(table, where: 'id = ?', whereArgs: [id]);
   }
+
   Future<int> updateItem(UnmanagedItem item) async {
     Database db = await database;
-    return db.update('UnmanagedItem', item.toMap(), where: 'id = ?', whereArgs: [item.id]);
+    return db.update('UnmanagedItem', item.toMap(),
+        where: 'id = ?', whereArgs: [item.id]);
   }
-
 }
