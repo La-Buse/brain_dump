@@ -14,9 +14,13 @@ class NextAction extends NextActionInterface {
   static Future<List<NextAction>> readNextActionsFromDb(int parentId) async {
     Database db = await DatabaseClient().database;
     var test = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
-    String queryString = 'SELECT * FROM NextAction' + (parentId == -1 || parentId == null ? '' : ' WHERE id = ?');
-    List<Object> args = parentId == -1 || parentId == null ? [] : [parentId];
-    List<Map<String, dynamic>> result = await db.rawQuery(queryString);
+    List<Map<String, dynamic>> result;
+    if (parentId == null || parentId == -1) {
+      result = await db.rawQuery( 'SELECT * FROM NextAction');
+    } else {
+      result = await db.rawQuery( 'SELECT * FROM NextAction WHERE parentId = ?', [parentId]);
+    }
+
     List<NextAction> actions = [];
     result.forEach((map) {
       NextAction nextAction = new NextAction();
@@ -27,7 +31,8 @@ class NextAction extends NextActionInterface {
   }
 
   static Future<int> addNextActionToDb(NextAction action) async {
-    Database db = await DatabaseClient().database;
+    var dbClass = DatabaseClient();
+    Database db = await dbClass.database;
     action.id = await db.insert(dbTableName, action.toMap());
     return action.id;
   }
@@ -42,7 +47,9 @@ class NextAction extends NextActionInterface {
     this.parentId = map['parent_id'];
     this.name = map['name'];
     this.dateCreated = DateTime.parse(map['date_created']);
-    this.dateAccomplished = DateTime.parse(map['date_acomplished']);
+    if (map['date_accomplished'] != null) {
+      this.dateAccomplished = DateTime.parse(map['date_accomplished']); //TODO mettre ca dans une fonction ou utiliser une librarie qui gere les objets comme du monde
+    }
   }
 
   setName(String newName) {

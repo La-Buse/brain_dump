@@ -12,9 +12,13 @@ class NextActionContext extends NextActionInterface {
 
   static Future<List<NextActionContext>> readContextsFromDb(int parentId) async {
     Database db = await DatabaseClient().database;
-    String queryString = 'SELECT * FROM NextActionContext' + (parentId == -1 ? '' : ' WHERE id = ?');
-    List<Object> args = parentId == -1 ? [] : [parentId];
-    List<Map<String, dynamic>> result = await db.rawQuery(queryString, args);
+    List<Map<String, dynamic>> result;
+    if (parentId == -1 || parentId == null) {
+      result = await db.rawQuery('SELECT * FROM NextActionContext');
+    } else {
+      result = await db.rawQuery('SELECT * FROM NextActionContext WHERE parentId = ?', [parentId]);
+    }
+
     List<NextActionContext> contexts = [];
     result.forEach((map) {
       NextActionContext nextAction = new NextActionContext();
