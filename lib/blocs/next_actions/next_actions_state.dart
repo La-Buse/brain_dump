@@ -31,11 +31,11 @@ class InitialNextActionsState extends NextActionsState {
 
 class InitializedNextActionsState extends NextActionsState {
   InitializedNextActionsState(List<NextActionInterface> actions2, int parentId) : super(actions2, parentId);
-  getNumberOfActions() {
+  int getNumberOfActions() {
     return actions.length;
   }
-  getAction(int index) {
-    if (actions.length -1 <= index) {
+  NextAction getAction(int index) {
+    if (index <= actions.length -1) {
       return actions[index];
     } else {
       return null;
@@ -43,6 +43,6 @@ class InitializedNextActionsState extends NextActionsState {
   }
 
   int getParentId() {
-    return this.getParentId();
+    return this.parentId;
   }
 }

@@ -2,7 +2,7 @@ import 'package:brain_dump/models/next_actions/next_action.dart';
 import 'package:brain_dump/models/unmanaged_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:brain_dump/blocs/unmanaged_item/bloc.dart';
+import 'package:brain_dump/widgets/confirmation_dialog.dart';
 import 'dart:async';
 import 'package:brain_dump/blocs/next_actions/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,6 +31,9 @@ Context: context in which next actions will be easily done. Example: At home, at
     return BlocBuilder(
         bloc: nextActionsBloc,
         builder: (BuildContext context, NextActionsState state) {
+          if (state is InitialNextActionsState) {
+            nextActionsBloc.add(FetchActionsEvent());
+          }
           return new Scaffold(
             appBar: new AppBar(
               title: new Text("Next actions"),
@@ -50,7 +53,8 @@ Context: context in which next actions will be easily done. Example: At home, at
                 PopupMenuButton<String>(
                   onSelected: (String optionSelected) {
                     if (optionSelected.compareTo(popUpOptions[0]) == 0) {
-                      addNextAction(state.getParentId());
+                      int parentId = state.getParentId();
+                      addNextAction(parentId);
                     } else {
                       addActionContext(state.getParentId());
                     }
@@ -74,20 +78,31 @@ Context: context in which next actions will be easily done. Example: At home, at
                 itemBuilder: (context, i) {
                   NextAction action = state.getAction(i);
                   return new ListTile(
-                      title: new Text(action.name),
+                      title: new Text(action.getName()),
                       trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children:
                           [
-                            new Checkbox(
-                              value: false,
-                              onChanged:(newValue) {
-
-                              }
+                            new IconButton(
+                              icon: new Icon(Icons.delete),
+                              onPressed: () {
+                                ConfirmationDialog.
+                                  confirmationDialog(
+                                      context,
+                                      'Are you sure you want to delete this action?',
+                                    () {nextActionsBloc.add(DeleteActionEvent(action.id));})
+                                ;
+                              },
                             ),
                             new IconButton(
                                 icon: new Icon(Icons.edit),
                                 onPressed: () { }
+                            ),
+                            new Checkbox(
+                                value: false,
+                                onChanged:(newValue) {
+
+                                }
                             ),
                           ]),
                       onTap: () {
@@ -124,10 +139,9 @@ Context: context in which next actions will be easily done. Example: At home, at
                   child: new Text('Cancel')),
               new FlatButton(
                   onPressed: () {
-
                     if (newNextActionName != null) {
                       nextActionsBloc
-                          .add(AddActionEvent(newNextActionName, '', parentId));
+                          .add(AddActionEvent(newNextActionName, parentId));
                     }
                     newNextActionName = null;
                     Navigator.of(context).pop();
@@ -163,7 +177,7 @@ Context: context in which next actions will be easily done. Example: At home, at
                   onPressed: () {
                     if (newNextActionName != null) {
                       nextActionsBloc
-                          .add(AddActionEvent(newNextActionName, '', parentId));
+                          .add(AddActionEvent(newNextActionName, parentId));
                     }
                     newNextActionName = null;
                     Navigator.of(context).pop();
