@@ -10,7 +10,7 @@ abstract class NextActionsState {
         this.actions = actions2, this.parentId = parentId;
 
   int getNumberOfActions();
-  NextAction getAction(int index);
+  NextActionInterface getAction(int index);
   int getParentId();
 }
 
@@ -34,7 +34,7 @@ class InitializedNextActionsState extends NextActionsState {
   int getNumberOfActions() {
     return actions.length;
   }
-  NextAction getAction(int index) {
+  NextActionInterface getAction(int index) {
     if (index <= actions.length -1) {
       return actions[index];
     } else {

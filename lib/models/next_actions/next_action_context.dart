@@ -10,6 +10,14 @@ class NextActionContext extends NextActionInterface {
   String name;
   DateTime dateCreated;
 
+  String getName() {
+    return this.name;
+  }
+
+  int getId() {
+    return this.id;
+  }
+
   static Future<List<NextActionContext>> readContextsFromDb(int parentId) async {
     Database db = await DatabaseClient().database;
     List<Map<String, dynamic>> result;
@@ -69,6 +77,6 @@ class NextActionContext extends NextActionInterface {
   }
 
   bool isContext() {
-    return false;
+    return true;
   }
 }

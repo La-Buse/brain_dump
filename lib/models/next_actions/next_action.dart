@@ -15,6 +15,10 @@ class NextAction extends NextActionInterface {
     return this.name;
   }
 
+  int getId() {
+    return this.id;
+  }
+
   static Future<List<NextAction>> readNextActionsFromDb(int parentId) async {
     Database db = await DatabaseClient().database;
     var test = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");

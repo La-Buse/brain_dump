@@ -20,7 +20,9 @@ class FetchActionsEvent extends NextActionsEvent {
 }
 
 class AddContextEvent extends NextActionsEvent {
-
+  AddContextEvent(String contextName, int parentId) :
+        super(contextName: contextName,
+        parentId:parentId);
 }
 
 class AddActionEvent extends NextActionsEvent {
