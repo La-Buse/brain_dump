@@ -7,7 +7,7 @@ import './bloc.dart';
 
 class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
   List<NextActionInterface> allActions;
-
+  List<int> contextIdsStack = [];
 
   @override
   NextActionsState get initialState => InitialNextActionsState();
@@ -32,7 +32,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
 
     } else if (event is DeleteActionEvent) {
       await NextAction.deleteNextAction(event.id);
-      allActions.removeWhere((action) {return action.getId() == event.id; });
+      allActions.removeWhere((action) {return !action.isContext() && action.getId() == event.id; });
       yield InitializedNextActionsState(this.allActions, state.parentId);
     } else if (event is AddContextEvent) {
       NextActionContext context = new NextActionContext();
@@ -41,7 +41,28 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       context.id = await NextActionContext.addActionContext(context);
       this.allActions.add(context);
       yield InitializedNextActionsState(this.allActions, state.parentId);
+    } else if (event is EditContextEvent) {
+      NextActionContext.editActionContext(event.id, event.contextName);
+      NextActionContext edited = this.allActions.where((x) {
+        return x.isContext() && x.getId() == event.id;
+      }).toList()[0];
+      edited.setName(event.contextName);
+      yield InitializedNextActionsState(this.allActions, state.parentId);
+    } else if (event is EditActionEvent) {
+      NextAction.editAction(event.id, event.actionName);
+      NextAction edited = this.allActions.where((x) {
+        return !x.isContext() && x.getId() == event.id;
+      }).toList()[0];
+      edited.name = event.actionName;
+      yield InitializedNextActionsState(this.allActions, state.parentId);
+    } else if (event is ChangeContext) {
+      this.contextIdsStack.add(event.parentId);
+
     }
+  }
+
+  List<NextActionInterface> getAllActions() {
+
   }
 
 }

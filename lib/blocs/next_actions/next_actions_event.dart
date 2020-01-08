@@ -35,3 +35,21 @@ class DeleteActionEvent extends NextActionsEvent {
   DeleteActionEvent(int id) :
         super(id: id);
 }
+
+class EditActionEvent extends NextActionsEvent {
+  EditActionEvent(String actionName, int id):
+      super(actionName: actionName, id: id);
+}
+
+class EditContextEvent extends NextActionsEvent {
+  EditContextEvent(String contextName, int id):
+      super(contextName: contextName, id: id);
+}
+
+class ChangeContext extends NextActionsEvent {
+  ChangeContext(int parentId): super(parentId: parentId);
+}
+
+class GoBackContext extends NextActionsEvent {
+  
+}

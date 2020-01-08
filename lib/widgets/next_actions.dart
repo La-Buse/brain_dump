@@ -26,8 +26,6 @@ Context: context in which next actions will be easily done. Example: At home, at
 ''';
   final popUpOptions = ['Add action', 'Add context'];
   final key = new GlobalKey();
-  String newNextActionName = '';
-  String newContextName = '';
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +35,15 @@ Context: context in which next actions will be easily done. Example: At home, at
           if (state is InitialNextActionsState) {
             nextActionsBloc.add(FetchActionsEvent());
           }
+          List<Widget> scaffoldChildren = [];
+          scaffoldChildren.add(Text("Next Actions"));
+          if (state.getParentId() != null && state.getParentId() != -1) {
+            scaffoldChildren.add(Text(state.getParentId().toString()));
+          }
           return new Scaffold(
-            appBar: new AppBar(title: new Text("Next actions"), actions: [
+            appBar: new AppBar(title: new Column(
+                children: scaffoldChildren),
+              actions: [
               FloatingActionButton(
                 key: UniqueKey(),
                 child: Tooltip(
@@ -53,9 +58,25 @@ Context: context in which next actions will be easily done. Example: At home, at
               ),
               PopupMenuButton<String>(onSelected: (String optionSelected) {
                 if (optionSelected.compareTo(popUpOptions[0]) == 0) {
-                  addNextAction(state.getParentId());
+                  ConfirmationDialog.oneFieldInput(
+                      context, 'Enter a short description for the action',
+                      (String newActionName) {
+                    if (newActionName != null && newActionName != '') {
+                      nextActionsBloc.add(
+                          AddActionEvent(newActionName, state.getParentId()));
+                    }
+                    Navigator.of(context).pop();
+                  }, '');
                 } else {
-                  addActionContext(state.getParentId());
+                  ConfirmationDialog.oneFieldInput(
+                      context, 'Enter the context name', (String contextName) {
+                    if (contextName != null && contextName != '') {
+                      nextActionsBloc.add(
+                          AddContextEvent(contextName, state.getParentId()));
+                    }
+                    contextName = null;
+                    Navigator.of(context).pop();
+                  }, '');
                 }
               }, itemBuilder: (BuildContext context) {
                 return popUpOptions.map((String choice) {
@@ -65,114 +86,67 @@ Context: context in which next actions will be easily done. Example: At home, at
                   );
                 }).toList();
               }),
-            ]),
+            ],
+            ),
             body: new ListView.builder(
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
                 itemCount: state.getNumberOfActions(),
                 itemBuilder: (context, i) {
-                  NextActionInterface action =
-                    state.getAction(i);
-                  List<Widget> rowChildren = [
-                    new IconButton(
-                      icon: new Icon(Icons.delete),
-                      onPressed: () {
-                        ConfirmationDialog.confirmationDialog(context,
-                            'Are you sure you want to delete this action?',
-                                () {
-                              nextActionsBloc.add(DeleteActionEvent(action.getId()));
-                            });
-                      },
-                    ),
-                    new IconButton(
-                        icon: new Icon(Icons.edit), onPressed: () {}),
-                  ];
+                  NextActionInterface action = state.getAction(i);
+                  List<String> options = ['Edit', 'Delete'];
                   if (!action.isContext()) {
-                    rowChildren.add(new Checkbox(value: false, onChanged: (newValue) {}));
+                    options.add('Mark as done');
                   }
                   return new ListTile(
-
                       subtitle: action.isContext() ? Text('context') : null,
                       title: new Text(action.getName()),
-                      trailing: Row(mainAxisSize: MainAxisSize.min, children: rowChildren),
-                      onTap: () {});
+                      trailing: PopupMenuButton(
+                        onSelected: (String selection) {
+                          if (selection == 'Delete') {
+                            ConfirmationDialog.confirmationDialog(context,
+                                'Are you sure you want to delete this action?',
+                                () {
+                              nextActionsBloc
+                                  .add(DeleteActionEvent(action.getId()));
+                            });
+                          } else if (selection == 'Edit') {
+                            ConfirmationDialog.oneFieldInput(
+                                context,
+                                'Enter a short description for the ' +
+                                    (action.isContext()
+                                        ? 'context.'
+                                        : 'action.'), (String newName) {
+                              if (action.isContext()) {
+                                nextActionsBloc.add(
+                                    EditContextEvent(newName, action.getId()));
+                              } else {
+                                nextActionsBloc.add(
+                                    EditActionEvent(newName, action.getId()));
+                              }
+                            }, action.getName());
+                          } else if (selection == 'Mark as done') {}
+                        },
+                        itemBuilder: (BuildContext context) {
+                          {
+                            return options.map((String selection) {
+                              return PopupMenuItem<String>(
+                                value: selection,
+                                child: Text(selection),
+                              );
+                            }).toList();
+                          }
+                        },
+                      ),
+                      //Row(mainAxisSize: MainAxisSize.min, children: rowChildren),
+                      onTap: () {
+                        if (action.isContext()) {
+
+                        }
+                      });
                 }),
           );
         });
-  }
-
-  Future<Null> addNextAction(int parentId) async {
-    return showDialog(
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return new AlertDialog(
-            contentPadding: EdgeInsets.all(20.0),
-            title: new Text(
-                "Describe this next action with 50 characters or less."),
-            content: new TextField(
-                decoration: new InputDecoration(
-                  labelText: "Description: ",
-                ),
-                onChanged: (String str) {
-                  newNextActionName = str;
-                }),
-            actions: [
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Cancel')),
-              new FlatButton(
-                  onPressed: () {
-                    if (newNextActionName != null) {
-                      nextActionsBloc
-                          .add(AddActionEvent(newNextActionName, parentId));
-                    }
-                    newNextActionName = null;
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Confirm'))
-            ]);
-      },
-      context: context,
-    );
-  }
-
-  Future<Null> addActionContext(int parentId) async {
-    return showDialog(
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return new AlertDialog(
-            contentPadding: EdgeInsets.all(20.0),
-            title: new Text(
-                "Describe this action context with 50 characters or less."),
-            content: new TextField(
-                decoration: new InputDecoration(
-                  labelText: "Description: ",
-                ),
-                onChanged: (String str) {
-                  newContextName = str;
-                }),
-            actions: [
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Cancel')),
-              new FlatButton(
-                  onPressed: () {
-                    if (newContextName != null) {
-                      nextActionsBloc
-                          .add(AddContextEvent(newContextName, parentId));
-                    }
-                    newContextName = null;
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Confirm'))
-            ]);
-      },
-      context: context,
-    );
   }
 
   @override

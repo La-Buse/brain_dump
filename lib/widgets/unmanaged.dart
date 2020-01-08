@@ -79,10 +79,11 @@ class _InTrayState extends State<InTray> {
         return new AlertDialog(
             contentPadding: EdgeInsets.all(20.0),
             title: new Text("Describe your stuff with 50 characters or less."),
-            content: new TextField(
+            content: new TextFormField(
+                initialValue: item.name,
                 decoration: new InputDecoration(
                   labelText: "Description: ",
-                  hintText: item.name,
+                  //hintText: item.name,
                 ),
                 onChanged: (String str) {
                   editedName = str;

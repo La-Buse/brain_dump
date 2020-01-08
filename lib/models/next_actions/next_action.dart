@@ -38,6 +38,17 @@ class NextAction extends NextActionInterface {
     return actions;
   }
 
+  static Future<NextAction> editAction(int id, String actionName) async {
+    Database db = await DatabaseClient().database;
+    NextAction context = new NextAction();
+    List<Map<String, dynamic>> result = await db.rawQuery(
+        'SELECT * FROM NextAction WHERE id = ?', [id]);
+    context.fromMap(result[0]);
+    context.name = actionName;
+    db.update('NextAction', context.toMap(), where: 'id = ?', whereArgs: [id] );
+    return context;
+  }
+
   static Future<int> addNextActionToDb(NextAction action) async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;

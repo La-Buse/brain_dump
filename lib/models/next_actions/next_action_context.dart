@@ -47,6 +47,17 @@ class NextActionContext extends NextActionInterface {
     return await db.delete(dbTableName, where: 'id = ?', whereArgs: [id]);
   }
 
+  static Future<NextActionContext> editActionContext(int id, String contextName) async {
+    Database db = await DatabaseClient().database;
+    NextActionContext context = new NextActionContext();
+    List<Map<String, dynamic>> result = await db.rawQuery(
+        'SELECT * FROM NextActionContext WHERE id = ?', [id]);
+    context.fromMap(result[0]);
+    context.name = contextName;
+    db.update('NextActionContext', context.toMap(), where: 'id = ?', whereArgs: [id] );
+    return context;
+  }
+
   fromMap(Map<String, dynamic> map) {
     this.id = map['id'];
     this.parentId = map['parent_id'];
