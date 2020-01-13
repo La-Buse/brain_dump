@@ -38,11 +38,21 @@ Context: context in which next actions will be easily done. Example: At home, at
           List<Widget> scaffoldChildren = [];
           scaffoldChildren.add(Text("Next Actions"));
           if (state.getParentId() != null && state.getParentId() != -1) {
-            scaffoldChildren.add(Text(state.getParentId().toString()));
+            scaffoldChildren.add(Text(state.contextName, textScaleFactor: 0.5,));
           }
           return new Scaffold(
             appBar: new AppBar(title: new Column(
                 children: scaffoldChildren),
+              automaticallyImplyLeading: false,
+                leading: IconButton(icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    if (state.getParentId() == null || state.getParentId() <= 0) {
+                      Navigator.of(context).pop();
+                    } else {
+                      nextActionsBloc.add(GoBackContextEvent());
+                    }
+                  },
+                ),
               actions: [
               FloatingActionButton(
                 key: UniqueKey(),
@@ -65,7 +75,6 @@ Context: context in which next actions will be easily done. Example: At home, at
                       nextActionsBloc.add(
                           AddActionEvent(newActionName, state.getParentId()));
                     }
-                    Navigator.of(context).pop();
                   }, '');
                 } else {
                   ConfirmationDialog.oneFieldInput(
@@ -141,7 +150,7 @@ Context: context in which next actions will be easily done. Example: At home, at
                       //Row(mainAxisSize: MainAxisSize.min, children: rowChildren),
                       onTap: () {
                         if (action.isContext()) {
-
+                          nextActionsBloc.add(ChangeContextEvent(action.getId(), action.getName()));
                         }
                       });
                 }),

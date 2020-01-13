@@ -46,10 +46,11 @@ class EditContextEvent extends NextActionsEvent {
       super(contextName: contextName, id: id);
 }
 
-class ChangeContext extends NextActionsEvent {
-  ChangeContext(int parentId): super(parentId: parentId);
+class ChangeContextEvent extends NextActionsEvent {
+  ChangeContextEvent(int parentId, String contextName):
+        super(parentId: parentId, contextName: contextName);
 }
 
-class GoBackContext extends NextActionsEvent {
+class GoBackContextEvent extends NextActionsEvent {
   
 }

@@ -6,8 +6,9 @@ import 'package:brain_dump/models/next_actions/next_action.dart';
 abstract class NextActionsState {
   final List<NextActionInterface> actions;
   final int parentId;
-  NextActionsState(List<NextActionInterface> actions2, int parentId) :
-        this.actions = actions2, this.parentId = parentId;
+  final String contextName;
+  NextActionsState({List<NextActionInterface> actions: const [],  int parentId: -1, String contextName: ''}) :
+        this.actions = actions, this.parentId = parentId, this.contextName = contextName;
 
   int getNumberOfActions();
   NextActionInterface getAction(int index);
@@ -15,7 +16,7 @@ abstract class NextActionsState {
 }
 
 class InitialNextActionsState extends NextActionsState {
-  InitialNextActionsState() : super([], null);
+  InitialNextActionsState() : super();
   getNumberOfActions() {
     return 0;
   }
@@ -30,7 +31,8 @@ class InitialNextActionsState extends NextActionsState {
 }
 
 class InitializedNextActionsState extends NextActionsState {
-  InitializedNextActionsState(List<NextActionInterface> actions2, int parentId) : super(actions2, parentId);
+  InitializedNextActionsState(List<NextActionInterface> actions2, int parentId, {contextName: ''}) :
+        super(actions: actions2, parentId: parentId, contextName: contextName);
   int getNumberOfActions() {
     return actions.length;
   }

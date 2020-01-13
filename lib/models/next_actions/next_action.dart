@@ -24,9 +24,9 @@ class NextAction extends NextActionInterface {
     var test = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
     List<Map<String, dynamic>> result;
     if (parentId == null || parentId == -1) {
-      result = await db.rawQuery( 'SELECT * FROM NextAction');
+      result = await db.rawQuery( 'SELECT * FROM NextAction WHERE parent_id IS NULL');
     } else {
-      result = await db.rawQuery( 'SELECT * FROM NextAction WHERE parentId = ?', [parentId]);
+      result = await db.rawQuery( 'SELECT * FROM NextAction WHERE parent_id = ?', [parentId]);
     }
 
     List<NextAction> actions = [];

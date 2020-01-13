@@ -22,9 +22,9 @@ class NextActionContext extends NextActionInterface {
     Database db = await DatabaseClient().database;
     List<Map<String, dynamic>> result;
     if (parentId == -1 || parentId == null) {
-      result = await db.rawQuery('SELECT * FROM NextActionContext');
+      result = await db.rawQuery('SELECT * FROM NextActionContext WHERE parent_id IS NULL');
     } else {
-      result = await db.rawQuery('SELECT * FROM NextActionContext WHERE parentId = ?', [parentId]);
+      result = await db.rawQuery('SELECT * FROM NextActionContext WHERE parent_id = ?', [parentId]);
     }
 
     List<NextActionContext> contexts = [];
