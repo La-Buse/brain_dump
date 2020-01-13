@@ -18,7 +18,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
     NextActionsEvent event,
   ) async* {
     if (event is FetchActionsEvent) {
-      await setAllActions(event.parentId);
+      await _setAllActions(event.parentId);
       yield InitializedNextActionsState(this.allActions, state.parentId);
     }
     if (event is AddActionEvent) {
@@ -33,6 +33,16 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       await NextAction.deleteNextAction(event.id);
       allActions.removeWhere((action) {return !action.isContext() && action.getId() == event.id; });
       yield InitializedNextActionsState(this.allActions, state.parentId);
+    } else if (event is DeleteContextEvent) {
+      List<int> contextIds = await _getAllContextIdsAssociatedWithContext(event.id);
+      contextIds.forEach((int id) async {
+        await NextActionContext.deleteActionContext(id);
+      });
+      List<int> actionIds = await _getAllActionIdsAssociatedWithContext(event.id);
+      actionIds.forEach((int id) async {
+        await NextAction.deleteNextAction(id);
+      });
+      await _setAllActions(event.parentId);
     } else if (event is AddContextEvent) {
       NextActionContext context = new NextActionContext();
       context.name = event.contextName;
@@ -57,7 +67,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
     } else if (event is ChangeContextEvent) {
       this.contextIdsStack.add(event.parentId);
       this.contextNamesStack.add(event.contextName);
-      await this.setAllActions(event.parentId);
+      await this._setAllActions(event.parentId);
       yield InitializedNextActionsState(
           this.allActions,
           event.parentId,
@@ -70,7 +80,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       String currentContextName =
         this.contextNamesStack.length > 0 ? this.contextNamesStack.last : '';
 
-      await setAllActions(currentParentId);
+      await _setAllActions(currentParentId);
       yield InitializedNextActionsState(
           this.allActions,
           currentParentId,
@@ -79,10 +89,30 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
     }
   }
 
-  Future<void> setAllActions(int parentId) async {
+  Future<void> _setAllActions(int parentId) async {
     var actions = await NextAction.readNextActionsFromDb(parentId);
     var contexts = await NextActionContext.readContextsFromDb(parentId);
     this.allActions = new List.from(actions)..addAll(contexts);
+  }
+
+  Future<List<int>> _getAllContextIdsAssociatedWithContext(int contextId) async {
+    List<int> result = [contextId];
+    List<NextActionContext> contexts = await NextActionContext.readContextsFromDb(contextId);
+    contexts.forEach((NextActionContext c) async {
+      List<int> tempResult = await _getAllContextIdsAssociatedWithContext(c.id);
+      result..addAll(tempResult);
+    });
+    return result;
+  }
+
+  Future<List<int>> _getAllActionIdsAssociatedWithContext(int contextId) async {
+    List<int> result = [contextId];
+    List<NextAction> actions = await NextAction.readNextActionsFromDb(contextId);
+    actions.forEach((NextAction c) async {
+      List<int> tempResult = await _getAllActionIdsAssociatedWithContext(c.id);
+      result..addAll(tempResult);
+    });
+    return result;
   }
 
 }

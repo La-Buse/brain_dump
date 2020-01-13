@@ -113,12 +113,22 @@ Context: context in which next actions will be easily done. Example: At home, at
                       trailing: PopupMenuButton(
                         onSelected: (String selection) {
                           if (selection == 'Delete') {
-                            ConfirmationDialog.confirmationDialog(context,
-                                'Are you sure you want to delete this action?',
-                                () {
-                              nextActionsBloc
-                                  .add(DeleteActionEvent(action.getId()));
-                            });
+                            if (action.isContext()) {
+                              nextActionsBloc.add(
+                                  DeleteContextEvent(
+                                      action.getId(),
+                                      state.getParentId()
+                                  )
+                              );
+                            } else {
+                              ConfirmationDialog.confirmationDialog(context,
+                                  'Are you sure you want to delete this action?',
+                                      () {
+                                    nextActionsBloc
+                                        .add(DeleteActionEvent(action.getId()));
+                                  });
+                            }
+
                           } else if (selection == 'Edit') {
                             ConfirmationDialog.oneFieldInput(
                                 context,

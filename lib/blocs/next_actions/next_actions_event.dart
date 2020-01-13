@@ -36,6 +36,11 @@ class DeleteActionEvent extends NextActionsEvent {
         super(id: id);
 }
 
+class DeleteContextEvent extends NextActionsEvent {
+  DeleteContextEvent(int id, int parentId) :
+      super(id: id, parentId: parentId);
+}
+
 class EditActionEvent extends NextActionsEvent {
   EditActionEvent(String actionName, int id):
       super(actionName: actionName, id: id);
