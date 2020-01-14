@@ -12,7 +12,7 @@ class NextAction extends NextActionInterface {
   DateTime dateAccomplished;
 
   String getName() {
-    return this.name;
+    return this.name + ' ' + this.id.toString();
   }
 
   int getId() {
@@ -21,10 +21,10 @@ class NextAction extends NextActionInterface {
 
   static Future<List<NextAction>> readNextActionsFromDb(int parentId) async {
     Database db = await DatabaseClient().database;
-    var test = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
+    var test = await db.rawQuery('SELECT * FROM NextAction');
     List<Map<String, dynamic>> result;
     if (parentId == null || parentId == -1) {
-      result = await db.rawQuery( 'SELECT * FROM NextAction WHERE parent_id IS NULL');
+      result = await db.rawQuery( 'SELECT * FROM NextAction WHERE parent_id = -1');
     } else {
       result = await db.rawQuery( 'SELECT * FROM NextAction WHERE parent_id = ?', [parentId]);
     }
@@ -92,6 +92,8 @@ class NextAction extends NextActionInterface {
     }
     if (this.parentId != null) {
       map['parent_id'] = this.parentId;
+    } else {
+      map['parent_id'] = -1;
     }
     return map;
   }

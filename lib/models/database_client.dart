@@ -5,7 +5,7 @@ import 'package:path/path.dart';
 import 'dart:io';
 import 'package:async/async.dart';
 
-final dbVersion = 4;
+final dbVersion = 7;
 
 class DatabaseClient {
   Database _database;
@@ -37,7 +37,7 @@ class DatabaseClient {
     await db.execute('''
         CREATE TABLE NextAction (
         id INTEGER PRIMARY KEY,
-        parent_id INTEGER,
+        parent_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         date_created TEXT NOT NULL,
         date_accomplished TEXT)
@@ -45,7 +45,7 @@ class DatabaseClient {
     await db.execute('''
         CREATE TABLE NextActionContext (
         id INTEGER PRIMARY KEY,
-        parent_id INTEGER,
+        parent_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         date_created TEXT NOT NULL,
         date_accomplished TEXT)

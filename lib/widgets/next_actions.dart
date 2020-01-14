@@ -84,7 +84,6 @@ Context: context in which next actions will be easily done. Example: At home, at
                           AddContextEvent(contextName, state.getParentId()));
                     }
                     contextName = null;
-                    Navigator.of(context).pop();
                   }, '');
                 }
               }, itemBuilder: (BuildContext context) {

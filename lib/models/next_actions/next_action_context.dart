@@ -11,7 +11,7 @@ class NextActionContext extends NextActionInterface {
   DateTime dateCreated;
 
   String getName() {
-    return this.name;
+    return this.name + ' ' + this.id.toString();
   }
 
   int getId() {
@@ -21,8 +21,10 @@ class NextActionContext extends NextActionInterface {
   static Future<List<NextActionContext>> readContextsFromDb(int parentId) async {
     Database db = await DatabaseClient().database;
     List<Map<String, dynamic>> result;
+
+    var test = await db.rawQuery('SELECT * FROM NextActionContext');
     if (parentId == -1 || parentId == null) {
-      result = await db.rawQuery('SELECT * FROM NextActionContext WHERE parent_id IS NULL');
+      result = await db.rawQuery('SELECT * FROM NextActionContext WHERE parent_id = -1');
     } else {
       result = await db.rawQuery('SELECT * FROM NextActionContext WHERE parent_id = ?', [parentId]);
     }
@@ -83,6 +85,8 @@ class NextActionContext extends NextActionInterface {
     }
     if (this.parentId != null) {
       map['parent_id'] = this.parentId;
+    } else {
+      map['parent_id'] = -1;
     }
     return map;
   }

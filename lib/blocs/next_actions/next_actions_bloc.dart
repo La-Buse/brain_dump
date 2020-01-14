@@ -38,11 +38,12 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       contextIds.forEach((int id) async {
         await NextActionContext.deleteActionContext(id);
       });
-      List<int> actionIds = await _getAllActionIdsAssociatedWithContext(event.id);
+      List<int> actionIds = await _getAllActionIdsAssociatedWithContext(contextIds);
       actionIds.forEach((int id) async {
         await NextAction.deleteNextAction(id);
       });
       await _setAllActions(event.parentId);
+      yield InitializedNextActionsState(this.allActions, event.parentId);
     } else if (event is AddContextEvent) {
       NextActionContext context = new NextActionContext();
       context.name = event.contextName;
@@ -96,22 +97,34 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
   }
 
   Future<List<int>> _getAllContextIdsAssociatedWithContext(int contextId) async {
-    List<int> result = [contextId];
-    List<NextActionContext> contexts = await NextActionContext.readContextsFromDb(contextId);
-    contexts.forEach((NextActionContext c) async {
-      List<int> tempResult = await _getAllContextIdsAssociatedWithContext(c.id);
-      result..addAll(tempResult);
-    });
+    List<int> result = [];
+    List<int> toCheck = [contextId];
+    while (toCheck.length > 0) {
+      int current = toCheck.removeLast();
+      result.add(current);
+      List<NextActionContext> newContexts = await NextActionContext.readContextsFromDb(current);
+      List<int> contextIds = [];
+      contextIds = newContexts.map((NextActionContext c) {
+        return c.id;
+      }).toList();
+
+      result..addAll(contextIds);
+      result = result.toSet().toList();
+      toCheck..addAll(contextIds);
+      toCheck = toCheck.toSet().toList();
+    }
     return result;
   }
 
-  Future<List<int>> _getAllActionIdsAssociatedWithContext(int contextId) async {
-    List<int> result = [contextId];
-    List<NextAction> actions = await NextAction.readNextActionsFromDb(contextId);
-    actions.forEach((NextAction c) async {
-      List<int> tempResult = await _getAllActionIdsAssociatedWithContext(c.id);
-      result..addAll(tempResult);
-    });
+  Future<List<int>> _getAllActionIdsAssociatedWithContext(List<int> contextIds) async {
+    List<int> result = [];
+    while (contextIds.length > 0) {
+      int current = contextIds.removeLast();
+      List<NextAction> actions = await NextAction.readNextActionsFromDb(current);
+      result..addAll(actions.map((NextAction a) {
+        return a.id;
+      }));
+    }
     return result;
   }
 
