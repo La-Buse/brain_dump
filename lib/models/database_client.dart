@@ -5,7 +5,8 @@ import 'package:path/path.dart';
 import 'dart:io';
 import 'package:async/async.dart';
 
-final dbVersion = 7;
+final int launchVersion = 8;
+final int currentVersion = 15;
 
 class DatabaseClient {
   Database _database;
@@ -21,10 +22,17 @@ class DatabaseClient {
 
   Future<Database> create() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String databaseDirectory = join(directory.path, 'database_v' + dbVersion.toString() + '.db');
+//    String databaseDirectory = join(directory.path, 'database_v' + currentVersion.toString() + '.db');
+    String databaseDirectory = join(directory.path, 'database.db');
     var bdd =
-        await openDatabase(databaseDirectory, version: dbVersion, onCreate: _onCreate);
+        await openDatabase(databaseDirectory, version: currentVersion, onUpgrade: _onUpgrade);
     return bdd;
+  }
+
+  Future<Null> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < launchVersion) {
+      await _onCreate(db, newVersion);
+    }
   }
 
   Future<Null> _onCreate(Database db, int version) async {
