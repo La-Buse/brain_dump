@@ -67,7 +67,7 @@ class _ManageStuffState extends State<ManageStuff> {
           workflowBloc.add(current.nextEvent);
         } else {
           Navigator.of(context).pushNamedAndRemoveUntil(current.nextPageName, (Route<dynamic> route) {
-            return route.settings.name.compareTo('/') == 0;
+            return route.settings.name.compareTo('/Unmanaged') == 0;
           }, arguments: item);
         }
 

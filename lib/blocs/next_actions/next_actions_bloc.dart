@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:brain_dump/models/database_client.dart';
 import 'package:brain_dump/models/next_actions/next_action.dart';
 import 'package:brain_dump/models/next_actions/next_action_context.dart';
 import 'package:brain_dump/models/next_actions/next_action_interface.dart';
+import 'package:sqflite/sqflite.dart';
 import './bloc.dart';
 
 class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
@@ -26,6 +28,9 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       addedAction.name = event.actionName;
       addedAction.parentId = event.parentId;
       addedAction.id = await NextAction.addNextActionToDb(addedAction);
+      if (event.item != null) {
+        await DatabaseClient().delete(event.item.id, 'UnmanagedItem');
+      }
       this.allActions.add(addedAction);
       yield InitializedNextActionsState(this.allActions, state.parentId);
 

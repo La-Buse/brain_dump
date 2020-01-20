@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:brain_dump/blocs/unmanaged_item/bloc.dart';
 import 'dart:async';
-
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class InTray extends StatefulWidget {
@@ -27,7 +27,9 @@ class _InTrayState extends State<InTray> {
           if (state.getItemsLength() <= 0) {
             unmanagedItemBloc.add(InitialEvent());
           }
-          return new Scaffold(
+          return new
+
+          Scaffold(
             appBar: new AppBar(
               title: new Text("Unmanaged items"),
             ),

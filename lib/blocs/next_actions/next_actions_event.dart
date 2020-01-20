@@ -1,4 +1,5 @@
 import 'package:brain_dump/models/next_actions/next_action.dart';
+import 'package:brain_dump/models/unmanaged_item.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -8,11 +9,13 @@ abstract class NextActionsEvent {
     final String contextName;
     final int parentId;
     final int id;
-    NextActionsEvent({actionName: '', contextName: '', parentId: -1, id: -1}) :
+    final UnmanagedItem item;
+    NextActionsEvent({actionName: '', contextName: '', parentId: -1, id: -1, item: null}) :
         this.actionName = actionName,
         this.contextName = contextName,
         this.parentId = parentId,
-        this.id = id;
+        this.id = id,
+        this.item = item;
 }
 
 class FetchActionsEvent extends NextActionsEvent {
@@ -26,9 +29,9 @@ class AddContextEvent extends NextActionsEvent {
 }
 
 class AddActionEvent extends NextActionsEvent {
-  AddActionEvent(String actionName, int parentId) :
+  AddActionEvent(String actionName, int parentId, UnmanagedItem item) :
         super(
-          actionName: actionName, parentId: parentId);
+          actionName: actionName, parentId: parentId, item:item);
 }
 
 class DeleteActionEvent extends NextActionsEvent {

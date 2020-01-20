@@ -9,14 +9,22 @@ import 'package:brain_dump/blocs/next_actions/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NextActions extends StatefulWidget {
+  UnmanagedItem item;
+  NextActions({
+    Key key,
+    @required this.item
+  }) : super(key:key);
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return _NextActionsState();
+    return _NextActionsState(this.item);
   }
 }
 
 class _NextActionsState extends State<NextActions> {
+  _NextActionsState(UnmanagedItem item) : this.item = item;
+  UnmanagedItem item;
   final nextActionsBloc = NextActionsBloc();
   final tooltipMessage = '''Action : The next physical action that will 
 bring you closer to the completion of a task. 
@@ -72,8 +80,13 @@ Context: context in which next actions will be easily done. Example: At home, at
                       context, 'Enter a short description for the action',
                       (String newActionName) {
                     if (newActionName != null && newActionName != '') {
+                      UnmanagedItem temp;
+                      if (item != null) {
+                        temp = item;
+                        item = null;
+                      }
                       nextActionsBloc.add(
-                          AddActionEvent(newActionName, state.getParentId()));
+                          AddActionEvent(newActionName, state.getParentId(), temp));
                     }
                   }, '');
                 } else {

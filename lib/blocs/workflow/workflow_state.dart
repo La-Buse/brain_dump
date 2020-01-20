@@ -127,7 +127,7 @@ class CalendarOrNextActionsState extends WorkflowState {
   List<WorkflowButton> getButtons() {
     return [
       new WorkflowButton("Calendar", null, nextPageName: '/Unmanaged'),
-      new WorkflowButton("Next Actions", null, nextPageName: '/Unmanaged'),
+      new WorkflowButton("Next Actions", null, nextPageName: '/Next Actions'),
     ];
   }
 }

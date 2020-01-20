@@ -31,7 +31,7 @@ class RouteGenerator {
         break;
       case '/Next Actions':
         return MaterialPageRoute(
-          builder: (_) => NextActions(),
+          builder: (_) => NextActions(item: args,),
           settings: RouteSettings(name: '/Next Actions')
         );
       default:

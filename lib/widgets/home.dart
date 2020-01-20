@@ -10,7 +10,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<String> pages = ["Unmanaged", "Calendar", "Next Actions", "Projects", "Reference"];
+  List<String> pages = ["Unmanaged", "Calendar", "Next Actions", "Projects List", "Reference"];
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
