@@ -9,23 +9,27 @@ import 'package:brain_dump/blocs/next_actions/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NextActions extends StatefulWidget {
-  UnmanagedItem item;
+  UnmanagedItem unmanagedItem;
   NextActions({
     Key key,
-    @required this.item
+    @required this.unmanagedItem
   }) : super(key:key);
 
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return _NextActionsState(this.item);
+    return _NextActionsState(this.unmanagedItem);
   }
 }
 
 class _NextActionsState extends State<NextActions> {
-  _NextActionsState(UnmanagedItem item) : this.item = item;
+  _NextActionsState(UnmanagedItem item)  {
+    this.item = item;
+  }
+
   UnmanagedItem item;
   final nextActionsBloc = NextActionsBloc();
+
   final tooltipMessage = '''Action : The next physical action that will 
 bring you closer to the completion of a task. 
 Good: Call Gary to set merger meeting. Bad: Plan merger.
@@ -37,9 +41,19 @@ Context: context in which next actions will be easily done. Example: At home, at
 
   @override
   Widget build(BuildContext context) {
+
     return BlocBuilder(
         bloc: nextActionsBloc,
         builder: (BuildContext context, NextActionsState state) {
+          if (this.item != null ) {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              addActionDialog(state, this.item);
+              this.item = null;
+            });
+
+          }
+
+
           if (state is InitialNextActionsState) {
             nextActionsBloc.add(FetchActionsEvent());
           }
@@ -76,19 +90,7 @@ Context: context in which next actions will be easily done. Example: At home, at
               ),
               PopupMenuButton<String>(onSelected: (String optionSelected) {
                 if (optionSelected.compareTo(popUpOptions[0]) == 0) {
-                  ConfirmationDialog.oneFieldInput(
-                      context, 'Enter a short description for the action',
-                      (String newActionName) {
-                    if (newActionName != null && newActionName != '') {
-                      UnmanagedItem temp;
-                      if (item != null) {
-                        temp = item;
-                        item = null;
-                      }
-                      nextActionsBloc.add(
-                          AddActionEvent(newActionName, state.getParentId(), temp));
-                    }
-                  }, '');
+                  addActionDialog(state, null);
                 } else {
                   ConfirmationDialog.oneFieldInput(
                       context, 'Enter the context name', (String contextName) {
@@ -178,6 +180,29 @@ Context: context in which next actions will be easily done. Example: At home, at
                 }),
           );
         });
+  }
+
+  //@param initialValue : When this page is called from workflow, it means the
+  //user has chosen to add an unmanaged item to next actions. This is the description
+  //of the value
+  void addActionDialog(NextActionsState state, UnmanagedItem item) {
+    String initialTextValue = ''; // default value in text field
+    if (item != null) {
+      initialTextValue = item.name;
+    }
+    ConfirmationDialog.oneFieldInput(
+        context, 'Enter a short description for the action',
+            (String newActionName) {
+          if (newActionName != null && newActionName != '') {
+            UnmanagedItem temp;
+            if (item != null) {
+              temp = item;
+              item = null;
+            }
+            nextActionsBloc.add(
+                AddActionEvent(newActionName, state.getParentId(), temp));
+          }
+        }, initialTextValue);
   }
 
   @override

@@ -19,6 +19,7 @@ class ManageStuff extends StatefulWidget {
 class _ManageStuffState extends State<ManageStuff> {
   UnmanagedItem item;
   final workflowBloc = WorkflowBloc();
+  //only called one time at beginning of workflow ?
   _ManageStuffState(this.item) {
     workflowBloc.setItem(this.item);
   }
@@ -26,10 +27,10 @@ class _ManageStuffState extends State<ManageStuff> {
 
   @override
   Widget build(BuildContext context) {
+
     return new BlocBuilder(
       bloc: workflowBloc,
         builder: (BuildContext context, WorkflowState state) {
-
         return Scaffold(
               appBar: new AppBar(
                 automaticallyImplyLeading: false,
@@ -66,9 +67,18 @@ class _ManageStuffState extends State<ManageStuff> {
         if (current.nextEvent != null) {
           workflowBloc.add(current.nextEvent);
         } else {
-          Navigator.of(context).pushNamedAndRemoveUntil(current.nextPageName, (Route<dynamic> route) {
-            return route.settings.name.compareTo('/Unmanaged') == 0;
-          }, arguments: item);
+          /*
+          This navigation strategy is odd, but it is the only way I could make sure
+          that the unmanaged items page would be reloaded when coming back to it
+          after adding transforming an unmanaged item to next actions for example.
+          It did not work with pushNamedAndRemoveUntil for some reason.
+           */
+          Navigator.of(context).pushNamed(
+            current.nextPageName,
+            arguments: item,
+          ).then((value) {
+            Navigator.of(context).pop();
+          });
         }
 
       }));

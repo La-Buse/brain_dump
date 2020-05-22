@@ -21,6 +21,7 @@ class _InTrayState extends State<InTray> {
 
   @override
   Widget build(BuildContext context) {
+    bool myShrinkWrap = true;
     return BlocBuilder(
         bloc: unmanagedItemBloc,
         builder: (BuildContext context, UnmanagedItemState state) {
@@ -30,13 +31,14 @@ class _InTrayState extends State<InTray> {
           return new
 
           Scaffold(
+
             appBar: new AppBar(
-              title: new Text("Unmanaged items"),
+              title: new Text("Unmanaged stuff"),
             ),
             body:
                 new ListView.builder(
                     scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
+                    shrinkWrap: myShrinkWrap,
                     itemCount: state.getItemsLength(),
                     itemBuilder: (context, i) {
                       UnmanagedItem item = state.getItem(i);
@@ -60,7 +62,9 @@ class _InTrayState extends State<InTray> {
                           Navigator.of(context).pushNamed(
                               '/Manage stuff',
                               arguments: item,
-                          );
+                          ).then((value) {
+                            unmanagedItemBloc.add(InitialEvent());
+                          });
                         }
                       );
                     }),
