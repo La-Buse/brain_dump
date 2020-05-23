@@ -68,16 +68,17 @@ class _ManageStuffState extends State<ManageStuff> {
           workflowBloc.add(current.nextEvent);
         } else {
           /*
-          This navigation strategy is odd, but it is the only way I could make sure
+          This navigation strategy is odd, but it is the only way I found to make sure
           that the unmanaged items page would be reloaded when coming back to it
-          after adding transforming an unmanaged item to next actions for example.
+          after transforming an unmanaged item to next actions for example.
           It did not work with pushNamedAndRemoveUntil for some reason.
            */
+          //
           Navigator.of(context).pushNamed(
             current.nextPageName,
             arguments: item,
           ).then((value) {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(); // this will pop Manage stuff page and code in unmanaged.dart will be executed
           });
         }
 

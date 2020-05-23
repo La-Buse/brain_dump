@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:brain_dump/widgets/home.dart';
 import 'package:brain_dump/widgets/unmanaged.dart';
 import 'package:brain_dump/widgets/next_actions.dart';
+import 'package:brain_dump/widgets/calendar.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -33,6 +34,12 @@ class RouteGenerator {
         return MaterialPageRoute(
           builder: (_) => NextActions(unmanagedItem: args,),
           settings: RouteSettings(name: '/Next Actions')
+        );
+
+      case '/Calendar':
+        return MaterialPageRoute(
+          builder: (_) => Calendar(),
+            settings: RouteSettings(name: '/Calendar')
         );
       default:
         break;

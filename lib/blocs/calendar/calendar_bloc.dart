@@ -7,7 +7,7 @@ import 'package:brain_dump/models/next_actions/next_action_interface.dart';
 import 'package:sqflite/sqflite.dart';
 import './bloc.dart';
 
-class NextActionsBloc extends Bloc<CalendarEvent, CalendarState> {
+class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
 
   @override
   CalendarState get initialState => InitialCalendarState();
