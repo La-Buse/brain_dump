@@ -1,4 +1,4 @@
-import 'package:brain_dump/models/unmanaged_item.dart';
+import 'file:///C:/Users/levas/source/repos/brain_dump/lib/models/db_models/unmanaged_item/unmanaged_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'custom_text.dart';

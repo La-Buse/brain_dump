@@ -1,12 +1,14 @@
-import 'package:brain_dump/models/unmanaged_item.dart';
+import 'file:///C:/Users/levas/source/repos/brain_dump/lib/models/db_models/unmanaged_item/unmanaged_item.dart';
+import 'package:reflectable/mirrors.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:io';
 import 'package:async/async.dart';
+import 'package:brain_dump/models/db_models/next_actions/next_action.dart';
 
 final int launchVersion = 8;
-final int currentVersion = 15;
+final int currentVersion = 17;
 
 class DatabaseClient {
   Database _database;
@@ -30,12 +32,14 @@ class DatabaseClient {
   }
 
   Future<Null> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < launchVersion) {
+    if (oldVersion < launchVersion) { // switch to " oldVersion < newVersion" to apply modifications
       await _onCreate(db, newVersion);
     }
   }
 
   Future<Null> _onCreate(Database db, int version) async {
+    List<dynamic> myclasses = [ NextAction] ;
+    getAllDataInMemory(myclasses);
     await db.execute('''
       CREATE TABLE UnmanagedItem (
         id INTEGER PRIMARY KEY, 
@@ -58,25 +62,20 @@ class DatabaseClient {
         date_created TEXT NOT NULL,
         date_accomplished TEXT)
     ''');
+    await db.execute('''
+        CREATE TABLE CalendarItem (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        date_created TEXT NOT NULL,
+        date_accomplished TEXT)
+    ''');
   }
 
-  Future<UnmanagedItem> addUnmanagedItem(UnmanagedItem item) async {
-    Database myDatabase = await database;
-    item.id = await myDatabase.insert('UnmanagedItem', item.toMap());
-    return item;
-  }
-
-  Future<List<UnmanagedItem>> readUnmanagedItems() async {
-    Database myDatabase = await database;
-    List<Map<String, dynamic>> result =
-        await myDatabase.rawQuery('SELECT * FROM UnmanagedItem');
-    List<UnmanagedItem> items = [];
-    result.forEach((map) {
-      UnmanagedItem item = new UnmanagedItem();
-      item.fromMap(map);
-      items.add(item);
-    });
-    return items;
+  Future<Null> getAllDataInMemory(List classes) async {
+    for (ClassMirror c in classes) {
+      var result = c.invoke('readAll', []);
+    }
   }
 
   Future<int> delete(int id, String table) async {
@@ -84,9 +83,5 @@ class DatabaseClient {
     return await db.delete(table, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> updateItem(UnmanagedItem item) async {
-    Database db = await database;
-    return db.update('UnmanagedItem', item.toMap(),
-        where: 'id = ?', whereArgs: [item.id]);
-  }
+
 }

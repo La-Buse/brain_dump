@@ -1,7 +1,6 @@
-import 'package:brain_dump/models/next_actions/next_action_interface.dart';
+import 'package:brain_dump/models/db_models/next_actions/next_action_interface.dart';
 import 'package:brain_dump/models/database_client.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:async/async.dart';
 final  dbTableName = 'NextAction';
 
 class NextAction extends NextActionInterface {

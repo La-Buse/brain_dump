@@ -1,5 +1,5 @@
 import 'package:brain_dump/models/database_client.dart';
-import 'package:brain_dump/models/unmanaged_item.dart';
+import 'file:///C:/Users/levas/source/repos/brain_dump/lib/models/db_models/unmanaged_item/unmanaged_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 
@@ -11,14 +11,14 @@ class SaveItemEvent extends UnmanagedItemEvent {
     UnmanagedItem item = new UnmanagedItem();
     item.setName(name);
     DatabaseClient db = DatabaseClient();
-    db.addUnmanagedItem(item);
+    UnmanagedItem.addUnmanagedItem(item);
   }
 }
 
 class UpdateItemEvent extends UnmanagedItemEvent {
   UpdateItemEvent(UnmanagedItem item) {
     DatabaseClient db = DatabaseClient();
-    db.updateItem(item);
+    UnmanagedItem.updateItem(item);
   }
 }
 

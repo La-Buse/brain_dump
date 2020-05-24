@@ -1,4 +1,4 @@
-import 'package:brain_dump/models/unmanaged_item.dart';
+import 'file:///C:/Users/levas/source/repos/brain_dump/lib/models/db_models/unmanaged_item/unmanaged_item.dart';
 import 'package:meta/meta.dart';
 import 'package:brain_dump/models/database_client.dart';
 
@@ -27,7 +27,7 @@ class InitialUnmanagedItemState extends UnmanagedItemState {
 
   Future<void> initializeItems() async {
     DatabaseClient db = DatabaseClient();
-    List<UnmanagedItem> items = await db.readUnmanagedItems();
+    List<UnmanagedItem> items = await UnmanagedItem.readUnmanagedItems();
     this.items = items;
   }
 }
