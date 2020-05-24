@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'file:///C:/Users/levas/source/repos/brain_dump/lib/models/db_models/unmanaged_item/unmanaged_item.dart';
+import 'package:brain_dump/models/db_models/unmanaged_item/unmanaged_item.dart';
 import 'package:flutter/material.dart';
 import './bloc.dart';
 

@@ -18,7 +18,7 @@ class NextAction extends NextActionInterface {
     return this.id;
   }
 
-  static Future<List<NextAction>> readNextActionsFromDb(int parentId) async {
+  static Future<List<NextAction>> readAll(int parentId) async {
     Database db = await DatabaseClient().database;
     var test = await db.rawQuery('SELECT * FROM NextAction');
     List<Map<String, dynamic>> result;

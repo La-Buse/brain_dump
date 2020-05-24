@@ -1,4 +1,4 @@
-import 'file:///C:/Users/levas/source/repos/brain_dump/lib/models/db_models/unmanaged_item/unmanaged_item.dart';
+import 'package:brain_dump/models/db_models/unmanaged_item/unmanaged_item.dart';
 import 'package:reflectable/mirrors.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -8,7 +8,7 @@ import 'package:async/async.dart';
 import 'package:brain_dump/models/db_models/next_actions/next_action.dart';
 
 final int launchVersion = 8;
-final int currentVersion = 17;
+final int currentVersion = 21;
 
 class DatabaseClient {
   Database _database;
@@ -32,14 +32,16 @@ class DatabaseClient {
   }
 
   Future<Null> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < launchVersion) { // switch to " oldVersion < newVersion" to apply modifications
+    if (oldVersion < newVersion) { // switch to " oldVersion < newVersion" to apply modifications
       await _onCreate(db, newVersion);
     }
   }
 
   Future<Null> _onCreate(Database db, int version) async {
     List<dynamic> myclasses = [ NextAction] ;
-    getAllDataInMemory(myclasses);
+    List allElements = await getAllDataInMemory(myclasses);
+    print(allElements);
+
     await db.execute('''
       CREATE TABLE UnmanagedItem (
         id INTEGER PRIMARY KEY, 
@@ -72,10 +74,13 @@ class DatabaseClient {
     ''');
   }
 
-  Future<Null> getAllDataInMemory(List classes) async {
+  Future<List> getAllDataInMemory(List classes) async {
+    List list = new List();
     for (ClassMirror c in classes) {
       var result = c.invoke('readAll', []);
+      list.add(result);
     }
+    return list;
   }
 
   Future<int> delete(int id, String table) async {

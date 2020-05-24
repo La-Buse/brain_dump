@@ -96,7 +96,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
   }
 
   Future<void> _setAllActions(int parentId) async {
-    var actions = await NextAction.readNextActionsFromDb(parentId);
+    var actions = await NextAction.readAll(parentId);
     var contexts = await NextActionContext.readContextsFromDb(parentId);
     this.allActions = new List.from(actions)..addAll(contexts);
   }
@@ -125,7 +125,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
     List<int> result = [];
     while (contextIds.length > 0) {
       int current = contextIds.removeLast();
-      List<NextAction> actions = await NextAction.readNextActionsFromDb(current);
+      List<NextAction> actions = await NextAction.readAll(current);
       result..addAll(actions.map((NextAction a) {
         return a.id;
       }));
