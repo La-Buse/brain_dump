@@ -11,5 +11,5 @@ abstract class CalendarState {
 }
 
 class InitialCalendarState extends CalendarState {
-  InitialCalendarState(Map<DateTime, List> allEvents, List selectedDayEvents, DateTime selectedDay, DateTime newEventDate) : super(allEvents, selectedDayEvents, selectedDay, null);
+  InitialCalendarState(Map<DateTime, List> allEvents, List selectedDayEvents, DateTime selectedDay, DateTime newEventDate) : super(allEvents, selectedDayEvents, selectedDay, newEventDate);
 }
