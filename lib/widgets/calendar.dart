@@ -4,6 +4,8 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:brain_dump/blocs/calendar/bloc.dart';
 import 'package:brain_dump/widgets/confirmation_dialog.dart';
 
+import '../blocs/calendar/bloc.dart';
+
 class Calendar extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -23,30 +25,101 @@ class _CalendarState extends State<Calendar> {
         builder: (BuildContext context, CalendarState state) {
         Map<CalendarFormat,String> calendarFormat = new Map<CalendarFormat, String>();
         calendarFormat.putIfAbsent(CalendarFormat.month, () => 'month');
-//        final _selectedDay = DateTime.now();
-//        _events = {
-//          _selectedDay.subtract(Duration(days: 30)): ['Event A0', 'Event B0', 'Event C0'],
-//          _selectedDay.subtract(Duration(days: 27)): ['Event A1'],
-//          _selectedDay.subtract(Duration(days: 20)): ['Event A2', 'Event B2', 'Event C2', 'Event D2'],
-//          _selectedDay.subtract(Duration(days: 16)): ['Event A3', 'Event B3'],
-//          _selectedDay.subtract(Duration(days: 10)): ['Event A4', 'Event B4', 'Event C4'],
-//          _selectedDay.subtract(Duration(days: 4)): ['Event A5', 'Event B5', 'Event C5'],
-//          _selectedDay.subtract(Duration(days: 2)): ['Event A6', 'Event B6'],
-//          _selectedDay: ['Event A7', 'Event B7', 'Event C7', 'Event D7'],
-//          _selectedDay.add(Duration(days: 1)): ['Event A8', 'Event B8', 'Event C8', 'Event D8'],
-//          _selectedDay.add(Duration(days: 3)): Set.from(['Event A9', 'Event A9', 'Event B9']).toList(),
-//          _selectedDay.add(Duration(days: 7)): ['Event A10', 'Event B10', 'Event C10'],
-//          _selectedDay.add(Duration(days: 11)): ['Event A11', 'Event B11'],
-//          _selectedDay.add(Duration(days: 17)): ['Event A12', 'Event B12', 'Event C12', 'Event D12'],
-//          _selectedDay.add(Duration(days: 22)): ['Event A13', 'Event B13'],
-//          _selectedDay.add(Duration(days: 26)): ['Event A14', 'Event B14', 'Event C14'],
-//        };
-//        _selectedEvents = _events[_selectedDay] ?? [];
           return Scaffold(
-            appBar: new AppBar(
+              resizeToAvoidBottomPadding: false,
+              appBar: new AppBar(
 
               title: new Text("Calendar"),
+              actions:  [
+                  PopupMenuButton<String>(onSelected: (String optionSelected) {
+//                    dateNameDescriptionDialog(context,
+//                        state,
+//                            (newDate){
+//                               calendarBloc.add(NewEventDateSelected(newDate));
+//                            },
+//                        '');
+                  var inputField = '';
+                    return showDialog(
+                      barrierDismissible: true,
+                      builder: (BuildContext context) {
+                        DateTime now = DateTime.now();
+                        DateTime nowUtc = DateTime.utc(now.year, now.month, now.day);
+                        return new AlertDialog(
+                            contentPadding: EdgeInsets.all(20.0),
+                            title: new Text(
+                                state.newEventDate == null ? 'No date selected.' : state.newEventDate.toIso8601String()),
+                            content: ListView(
+                              children: [
+//                  Text(
+//                    'Enter date',
+//
+//                  ),
+                                RaisedButton(
+                                  child: Text('Pick a date'),
+                                  onPressed: () {
+                                    showDatePicker(
+                                        context: context,
+                                        initialDate: nowUtc,
+                                        firstDate: DateTime(1900),
+                                        lastDate: DateTime(2030)
+                                    ).then((date) {
+                                      calendarBloc.add(NewEventDateSelected(date));
+                                    });
+                                  },
+                                ),
+                                new TextFormField(
+                                    initialValue: inputField,
+                                    decoration: new InputDecoration(
+                                      labelText: "Name",
+                                    ),
+                                    onChanged: (String str) {
+                                      inputField = str;
+                                    }),
+                                new SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  reverse: true,
+
+                                  // here's the actual text box
+                                  child: new TextField(
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null, //grow automatically
+                                    decoration: new InputDecoration(
+                                      labelText: 'Description',
+                                    ),
+                                  ),
+                                  // ends the actual text box
+
+                                ),
+                              ],
+                            ),
+
+
+
+                            actions: [
+                              new FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: new Text('Cancel')),
+                              new FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+
+                                  },
+                                  child: new Text('Confirm'))
+                            ]);
+                      },
+                      context: context,
+                    );
+                  }, itemBuilder: (BuildContext context) {
+                  return [PopupMenuItem<String>(
+                    value: 'Add calendar event',
+                    child: Text('Add calendar event'),
+                  )];
+                  }),
+          ],
             ),
+
             body: Column(
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
@@ -94,5 +167,94 @@ class _CalendarState extends State<Calendar> {
   void dispose() {
     super.dispose();
     calendarBloc.close();
+  }
+
+  static Future<Null> dateNameDescriptionDialog(
+      BuildContext context,
+      CalendarState state,
+      Function callback,
+      String inputField
+      ) {
+
+    return showDialog(
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        DateTime now = DateTime.now();
+        DateTime nowUtc = DateTime.utc(now.year, now.month, now.day);
+        return new AlertDialog(
+            contentPadding: EdgeInsets.all(20.0),
+            title: new Text(
+                state.newEventDate == null ? 'No date selected.' : state.newEventDate.toIso8601String()),
+            content: ListView(
+              children: [
+//                  Text(
+//                    'Enter date',
+//
+//                  ),
+                RaisedButton(
+                  child: Text('Pick a date'),
+                  onPressed: () {
+                    showDatePicker(
+                        context: context,
+                        initialDate: nowUtc,
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2030)
+                    ).then((date) {
+                      callback(date);
+                    });
+                  },
+                ),
+                new TextFormField(
+                    initialValue: inputField,
+                    decoration: new InputDecoration(
+                      labelText: "Name",
+                    ),
+                    onChanged: (String str) {
+                      inputField = str;
+                    }),
+//                  new TextFormField(
+//                      initialValue: inputField,
+//                      decoration: new InputDecoration(
+//                        labelText: "Description",
+//                      ),
+//                      onChanged: (String str) {
+//                        inputField = str;
+//                      }),
+                new SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  reverse: true,
+
+                  // here's the actual text box
+                  child: new TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null, //grow automatically
+                    decoration: new InputDecoration(
+                      labelText: 'Description',
+                    ),
+                  ),
+                  // ends the actual text box
+
+                ),
+              ],
+            ),
+
+
+
+            actions: [
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text('Cancel')),
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    callback(inputField);
+                  },
+                  child: new Text('Confirm'))
+            ]);
+      },
+      context: context,
+    );
   }
 }

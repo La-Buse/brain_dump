@@ -16,5 +16,9 @@ class InitialCalendarEvent extends CalendarEvent {
 class NewDaySelectedEvent extends CalendarEvent {
     final DateTime daySelected;
     NewDaySelectedEvent(DateTime daySelected):this.daySelected = daySelected;
+}
 
+class NewEventDateSelected extends CalendarEvent {
+    final DateTime daySelected;
+    NewEventDateSelected(DateTime daySelected):this.daySelected = daySelected;
 }

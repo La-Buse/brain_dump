@@ -7,8 +7,10 @@ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:brain_dump/models/db_models/next_actions/next_action.dart';
 
+//'/data/user/0/braindump.brain_dump/app_flutter/database.db'
+
 final int launchVersion = 8;
-final int currentVersion = 21;
+final int currentVersion = 20;
 
 class DatabaseClient {
   Database _database;
@@ -38,32 +40,10 @@ class DatabaseClient {
   }
 
   Future<Null> _onCreate(Database db, int version) async {
-    List<dynamic> myclasses = [ NextAction] ;
-    List allElements = await getAllDataInMemory(myclasses);
-    print(allElements);
+//    List<dynamic> myclasses = [ NextAction] ;
+//    List allElements = await getAllDataInMemory(myclasses);
+//    print(allElements);
 
-    await db.execute('''
-      CREATE TABLE UnmanagedItem (
-        id INTEGER PRIMARY KEY, 
-        name TEXT NOT NULL,
-        date_created TEXT NOT NULL)
-    ''');
-    await db.execute('''
-        CREATE TABLE NextAction (
-        id INTEGER PRIMARY KEY,
-        parent_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        date_created TEXT NOT NULL,
-        date_accomplished TEXT)
-    ''');
-    await db.execute('''
-        CREATE TABLE NextActionContext (
-        id INTEGER PRIMARY KEY,
-        parent_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        date_created TEXT NOT NULL,
-        date_accomplished TEXT)
-    ''');
     await db.execute('''
         CREATE TABLE CalendarItem (
         id INTEGER PRIMARY KEY,
@@ -72,16 +52,40 @@ class DatabaseClient {
         date_created TEXT NOT NULL,
         date_accomplished TEXT)
     ''');
+
+//    await db.execute('''
+//      CREATE TABLE UnmanagedItem (
+//        id INTEGER PRIMARY KEY,
+//        name TEXT NOT NULL,
+//        date_created TEXT NOT NULL)
+//    ''');
+//    await db.execute('''
+//        CREATE TABLE NextAction (
+//        id INTEGER PRIMARY KEY,
+//        parent_id INTEGER NOT NULL,
+//        name TEXT NOT NULL,
+//        date_created TEXT NOT NULL,
+//        date_accomplished TEXT)
+//    ''');
+//    await db.execute('''
+//        CREATE TABLE NextActionContext (
+//        id INTEGER PRIMARY KEY,
+//        parent_id INTEGER NOT NULL,
+//        name TEXT NOT NULL,
+//        date_created TEXT NOT NULL,
+//        date_accomplished TEXT)
+//    ''');
+
   }
 
-  Future<List> getAllDataInMemory(List classes) async {
-    List list = new List();
-    for (ClassMirror c in classes) {
-      var result = c.invoke('readAll', []);
-      list.add(result);
-    }
-    return list;
-  }
+//  Future<List> getAllDataInMemory(List classes) async {
+//    List list = new List();
+//    for (ClassMirror c in classes) {
+//      var result = c.invoke('readAll', []);
+//      list.add(result);
+//    }
+//    return list;
+//  }
 
   Future<int> delete(int id, String table) async {
     Database db = await database;

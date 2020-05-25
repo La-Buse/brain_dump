@@ -65,17 +65,17 @@ Context: context in which next actions will be easily done. Example: At home, at
           return new Scaffold(
             appBar: new AppBar(title: new Column(
                 children: scaffoldChildren),
-              automaticallyImplyLeading: false,
-                leading: IconButton(icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    if (state.getParentId() == null || state.getParentId() <= 0) {
-                      Navigator.of(context).pop();
-                    } else {
-                      nextActionsBloc.add(GoBackContextEvent());
-                    }
+            automaticallyImplyLeading: false,
+            leading: IconButton(icon: Icon(Icons.arrow_back),
+                      onPressed: () {
+                        if (state.getParentId() == null || state.getParentId() <= 0) {
+                          Navigator.of(context).pop();
+                         } else {
+                          nextActionsBloc.add(GoBackContextEvent());
+                        }
                   },
                 ),
-              actions: [
+            actions: [
               FloatingActionButton(
                 key: UniqueKey(),
                 child: Tooltip(
