@@ -16,8 +16,6 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   final calendarBloc = CalendarBloc();
   final CalendarController calendarController = new CalendarController();
-  Map<DateTime, List> _events;
-  List _selectedEvents;
   @override
   Widget build(BuildContext context) {
     return new BlocBuilder(
@@ -32,85 +30,86 @@ class _CalendarState extends State<Calendar> {
               title: new Text("Calendar"),
               actions:  [
                   PopupMenuButton<String>(onSelected: (String optionSelected) {
-//                    dateNameDescriptionDialog(context,
-//                        state,
-//                            (newDate){
-//                               calendarBloc.add(NewEventDateSelected(newDate));
-//                            },
-//                        '');
-                  var inputField = '';
-                    return showDialog(
-                      barrierDismissible: true,
-                      builder: (BuildContext context) {
-                        DateTime now = DateTime.now();
-                        DateTime nowUtc = DateTime.utc(now.year, now.month, now.day);
-                        return new AlertDialog(
-                            contentPadding: EdgeInsets.all(20.0),
-                            title: new Text(
-                                state.newEventDate == null ? 'No date selected.' : state.newEventDate.toIso8601String()),
-                            content: ListView(
-                              children: [
-//                  Text(
-//                    'Enter date',
+                    dateNameDescriptionDialog(context,
+                        state,
+                            calendarBloc,
+                            (newDate){
+                               calendarBloc.add(NewEventDateSelected(newDate));
+                            },
+                        '');
+//                  var inputField = '';
+//                    return showDialog(
+//                      barrierDismissible: true,
+//                      builder: (BuildContext context) {
+//                        DateTime now = DateTime.now();
+//                        DateTime nowUtc = DateTime.utc(now.year, now.month, now.day);
+//                        return new AlertDialog(
+//                            contentPadding: EdgeInsets.all(20.0),
+//                            title: new Text(
+//                                state.newEventDate == null ? 'No date selected.' : state.newEventDate.toIso8601String()),
+//                            content: ListView(
+//                              children: [
+////                  Text(
+////                    'Enter date',
+////
+////                  ),
+//                                RaisedButton(
+//                                  child: Text('Pick a date'),
+//                                  onPressed: () {
+//                                    showDatePicker(
+//                                        context: context,
+//                                        initialDate: nowUtc,
+//                                        firstDate: DateTime(1900),
+//                                        lastDate: DateTime(2030)
+//                                    ).then((date) {
+//                                      calendarBloc.add(NewEventDateSelected(date));
+//                                    });
+//                                  },
+//                                ),
+//                                new TextFormField(
+//                                    initialValue: inputField,
+//                                    decoration: new InputDecoration(
+//                                      labelText: "Name",
+//                                    ),
+//                                    onChanged: (String str) {
+//                                      inputField = str;
+//                                    }),
+//                                new SingleChildScrollView(
+//                                  scrollDirection: Axis.vertical,
+//                                  reverse: true,
 //
-//                  ),
-                                RaisedButton(
-                                  child: Text('Pick a date'),
-                                  onPressed: () {
-                                    showDatePicker(
-                                        context: context,
-                                        initialDate: nowUtc,
-                                        firstDate: DateTime(1900),
-                                        lastDate: DateTime(2030)
-                                    ).then((date) {
-                                      calendarBloc.add(NewEventDateSelected(date));
-                                    });
-                                  },
-                                ),
-                                new TextFormField(
-                                    initialValue: inputField,
-                                    decoration: new InputDecoration(
-                                      labelText: "Name",
-                                    ),
-                                    onChanged: (String str) {
-                                      inputField = str;
-                                    }),
-                                new SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  reverse: true,
-
-                                  // here's the actual text box
-                                  child: new TextField(
-                                    keyboardType: TextInputType.multiline,
-                                    maxLines: null, //grow automatically
-                                    decoration: new InputDecoration(
-                                      labelText: 'Description',
-                                    ),
-                                  ),
-                                  // ends the actual text box
-
-                                ),
-                              ],
-                            ),
-
-
-
-                            actions: [
-                              new FlatButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: new Text('Cancel')),
-                              new FlatButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-
-                                  },
-                                  child: new Text('Confirm'))
-                            ]);
-                      },
-                      context: context,
-                    );
+//                                  // here's the actual text box
+//                                  child: new TextField(
+//                                    keyboardType: TextInputType.multiline,
+//                                    maxLines: null, //grow automatically
+//                                    decoration: new InputDecoration(
+//                                      labelText: 'Description',
+//                                    ),
+//                                  ),
+//                                  // ends the actual text box
+//
+//                                ),
+//                              ],
+//                            ),
+//
+//
+//
+//                            actions: [
+//                              new FlatButton(
+//                                  onPressed: () {
+//                                    Navigator.of(context).pop();
+//                                  },
+//                                  child: new Text('Cancel')),
+//                              new FlatButton(
+//                                  onPressed: () {
+//                                    Navigator.of(context).pop();
+//
+//                                  },
+//                                  child: new Text('Confirm'))
+//                            ]);
+//                      },
+//                      context: context,
+//                    );
                   }, itemBuilder: (BuildContext context) {
                   return [PopupMenuItem<String>(
                     value: 'Add calendar event',
@@ -172,89 +171,111 @@ class _CalendarState extends State<Calendar> {
   static Future<Null> dateNameDescriptionDialog(
       BuildContext context,
       CalendarState state,
+      CalendarBloc bloc,
       Function callback,
       String inputField
       ) {
-
-    return showDialog(
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        DateTime now = DateTime.now();
-        DateTime nowUtc = DateTime.utc(now.year, now.month, now.day);
-        return new AlertDialog(
-            contentPadding: EdgeInsets.all(20.0),
+        return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return new AlertDialog(
+//              title: new Text('Add a calendar event'),
             title: new Text(
                 state.newEventDate == null ? 'No date selected.' : state.newEventDate.toIso8601String()),
-            content: ListView(
-              children: [
-//                  Text(
-//                    'Enter date',
-//
-//                  ),
-                RaisedButton(
-                  child: Text('Pick a date'),
-                  onPressed: () {
-                    showDatePicker(
-                        context: context,
-                        initialDate: nowUtc,
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime(2030)
-                    ).then((date) {
-                      callback(date);
-                    });
-                  },
-                ),
-                new TextFormField(
-                    initialValue: inputField,
-                    decoration: new InputDecoration(
-                      labelText: "Name",
-                    ),
-                    onChanged: (String str) {
-                      inputField = str;
-                    }),
-//                  new TextFormField(
-//                      initialValue: inputField,
-//                      decoration: new InputDecoration(
-//                        labelText: "Description",
-//                      ),
-//                      onChanged: (String str) {
-//                        inputField = str;
-//                      }),
-                new SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  reverse: true,
+                actions: [
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: new Text('Cancel')),
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        callback(inputField);
+                      },
+                      child: new Text('Confirm'))
+                ],
+              content: new MyDialogContent(bloc)
+            );
+          }
+        );
 
-                  // here's the actual text box
-                  child: new TextField(
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null, //grow automatically
-                    decoration: new InputDecoration(
-                      labelText: 'Description',
-                    ),
-                  ),
-                  // ends the actual text box
+  }
 
-                ),
-              ],
+
+}
+class MyDialogContent extends StatefulWidget {
+  MyDialogContent(    CalendarBloc bloc,{
+    Key key,
+  }) :  this.calendarBloc = bloc, super(key: key);
+
+
+//  CalendarState calendarState;
+    CalendarBloc calendarBloc;
+  @override
+  State<StatefulWidget> createState() {
+    return new MyDialogContentState(this.calendarBloc);
+  }
+}
+
+class MyDialogContentState extends State<MyDialogContent> {
+  MyDialogContentState(CalendarBloc calendarBloc){
+    this.calendarBloc = calendarBloc;
+  }
+  CalendarBloc calendarBloc;
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+    DateTime nowUtc = DateTime.utc(now.year, now.month, now.day);
+    return new BlocBuilder(
+      bloc: this.calendarBloc,
+      builder: (BuildContext context, CalendarState state) {
+        String inputField = '';
+        return ListView(
+          children: [
+        new Text('Selected date : ' +
+            (state.newEventDate == null ? 'No date selected.' : state.newEventDate.toIso8601String())),
+            RaisedButton(
+              child: Text('Select another date'),
+              onPressed: () {
+                showDatePicker(
+                  context: context,
+                  initialDate: nowUtc,
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime(2030)
+                ).then((date) {
+                  calendarBloc.add(NewEventDateSelected(date));
+                });
+              },
             ),
+            new TextFormField(
+                initialValue: inputField,
+                decoration: new InputDecoration(
+                  labelText: "Name",
+                ),
+                onChanged: (String str) {
+                  inputField = str;
+                }),
+            new SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              reverse: true,
 
+              // here's the actual text box
+              child: new TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: null, //grow automatically
+                decoration: new InputDecoration(
+                  labelText: 'Description',
+                ),
+              ),
+              // ends the actual text box
 
+            ),
+          ],
+        );
 
-            actions: [
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Cancel')),
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    callback(inputField);
-                  },
-                  child: new Text('Confirm'))
-            ]);
-      },
-      context: context,
+      }
     );
   }
 }

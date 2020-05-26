@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "986369880503",
+    "firebase_url": "https://brain-dump-fe892.firebaseio.com",
+    "project_id": "brain-dump-fe892",
+    "storage_bucket": "brain-dump-fe892.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:986369880503:android:1d649a37a0fcb1d3323832",
+        "android_client_info": {
+          "package_name": "braindump.brain_dump"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "986369880503-5rjtmk0tlek0etafu0ofq38nbc4dtun0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlRQTlWDMDTQewvW0e7NoE6fuVfV1WQZM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "986369880503-5rjtmk0tlek0etafu0ofq38nbc4dtun0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

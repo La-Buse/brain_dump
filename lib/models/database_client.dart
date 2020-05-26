@@ -10,7 +10,7 @@ import 'package:brain_dump/models/db_models/next_actions/next_action.dart';
 //'/data/user/0/braindump.brain_dump/app_flutter/database.db'
 
 final int launchVersion = 8;
-final int currentVersion = 20;
+final int currentVersion = 21;
 
 class DatabaseClient {
   Database _database;
@@ -44,37 +44,37 @@ class DatabaseClient {
 //    List allElements = await getAllDataInMemory(myclasses);
 //    print(allElements);
 
+//    await db.execute('''
+//        CREATE TABLE CalendarItem (
+//        id INTEGER PRIMARY KEY,
+//        name TEXT NOT NULL,
+//        description TEXT NOT NULL,
+//        date_created TEXT NOT NULL,
+//        date_accomplished TEXT)
+//    ''');
+
     await db.execute('''
-        CREATE TABLE CalendarItem (
+      CREATE TABLE UnmanagedItem (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
-        description TEXT NOT NULL,
+        date_created TEXT NOT NULL)
+    ''');
+    await db.execute('''
+        CREATE TABLE NextAction (
+        id INTEGER PRIMARY KEY,
+        parent_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
         date_created TEXT NOT NULL,
         date_accomplished TEXT)
     ''');
-
-//    await db.execute('''
-//      CREATE TABLE UnmanagedItem (
-//        id INTEGER PRIMARY KEY,
-//        name TEXT NOT NULL,
-//        date_created TEXT NOT NULL)
-//    ''');
-//    await db.execute('''
-//        CREATE TABLE NextAction (
-//        id INTEGER PRIMARY KEY,
-//        parent_id INTEGER NOT NULL,
-//        name TEXT NOT NULL,
-//        date_created TEXT NOT NULL,
-//        date_accomplished TEXT)
-//    ''');
-//    await db.execute('''
-//        CREATE TABLE NextActionContext (
-//        id INTEGER PRIMARY KEY,
-//        parent_id INTEGER NOT NULL,
-//        name TEXT NOT NULL,
-//        date_created TEXT NOT NULL,
-//        date_accomplished TEXT)
-//    ''');
+    await db.execute('''
+        CREATE TABLE NextActionContext (
+        id INTEGER PRIMARY KEY,
+        parent_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        date_created TEXT NOT NULL,
+        date_accomplished TEXT)
+    ''');
 
   }
 
