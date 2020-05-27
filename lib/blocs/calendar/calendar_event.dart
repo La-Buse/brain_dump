@@ -20,5 +20,14 @@ class NewDaySelectedEvent extends CalendarEvent {
 
 class NewEventDateSelected extends CalendarEvent {
     final DateTime daySelected;
-    NewEventDateSelected(DateTime daySelected):this.daySelected = daySelected;
+    final String name;
+    final String description;
+    NewEventDateSelected(String name, String description, DateTime daySelected):this.name = name, this.description = description, this.daySelected = daySelected;
+}
+
+class AddNewCalendarEvent extends CalendarEvent {
+    final String name;
+    final String description;
+    final DateTime daySelected;
+    AddNewCalendarEvent(String name, String description, DateTime daySelected):this.name = name, this.description = description, this.daySelected = daySelected;
 }
