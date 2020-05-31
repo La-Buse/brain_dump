@@ -1,6 +1,7 @@
 import 'package:brain_dump/widgets/workflow.dart';
 import 'package:flutter/material.dart';
-import 'package:brain_dump/widgets/home.dart';
+import 'package:brain_dump/widgets/dashboard.dart';
+import 'package:brain_dump/widgets/authentication.dart';
 import 'package:brain_dump/widgets/unmanaged.dart';
 import 'package:brain_dump/widgets/next_actions.dart';
 import 'package:brain_dump/widgets/calendar.dart';
@@ -11,7 +12,7 @@ class RouteGenerator {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-            builder: (_) => Home(),
+            builder: (_) => Authentication(),
             settings: RouteSettings(name: '/')
         );
       case '/Manage stuff':
@@ -40,6 +41,17 @@ class RouteGenerator {
         return MaterialPageRoute(
           builder: (_) => Calendar(),
             settings: RouteSettings(name: '/Calendar')
+        );
+
+      case '/Dashboard':
+        return MaterialPageRoute(
+          builder: (_) => Dashboard(),
+          settings: RouteSettings(name: '/Dashboard')
+        );
+      case '/Authentication':
+        return MaterialPageRoute(
+          builder: (_) => Authentication(),
+          settings: RouteSettings(name: '/Authentication')
         );
       default:
         break;

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:brain_dump/blocs/calendar/bloc.dart';
-import 'package:brain_dump/widgets/confirmation_dialog.dart';
 
 import '../blocs/calendar/bloc.dart';
 

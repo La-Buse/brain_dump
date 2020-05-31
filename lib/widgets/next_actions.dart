@@ -56,6 +56,7 @@ Context: context in which next actions will be easily done. Example: At home, at
 
           if (state is InitialNextActionsState) {
             nextActionsBloc.add(FetchActionsEvent());
+            return new Center(child: CircularProgressIndicator(),);
           }
           List<Widget> scaffoldChildren = [];
           scaffoldChildren.add(Text("Next Actions"));

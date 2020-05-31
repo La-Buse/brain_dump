@@ -15,26 +15,26 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        centerTitle: true,
-        title: new Text("Brain Dump")
+          centerTitle: true,
+          title: new Text("Brain Dump")
       ),
       drawer: new Drawer(
         child: new Container(
-          child: new ListView.builder(
-            itemCount: pages.length ,
-            itemBuilder: (context, i) {
-              return new ListTile(
-                title: new Text(pages[i]),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed(
-                    '/' + pages[i]
+            child: new ListView.builder(
+                itemCount: pages.length ,
+                itemBuilder: (context, i) {
+                  return new ListTile(
+                    title: new Text(pages[i]),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pushNamed(
+                          '/' + pages[i]
+                      );
+                    },
                   );
-                },
-              );
-            }
-          ),
-          color: Colors.white
+                }
+            ),
+            color: Colors.white
         ),
 
       ),
@@ -44,10 +44,3 @@ class _HomeState extends State<Home> {
     );
   }
 }
-
-//return MaterialApp(
-//debugShowCheckedModeBanner: false,
-//theme: new ThemeData(
-//primarySwatch: Colors.blue,
-//),
-//);
