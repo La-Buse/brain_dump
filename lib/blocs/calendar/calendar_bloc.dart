@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:brain_dump/models/database_client.dart';
+import 'package:brain_dump/models/db_models/calendar/calendar_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import './bloc.dart';
@@ -48,11 +49,19 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       _newEventDate = event.daySelected;
       yield InitialCalendarState(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description);
     } else if (event is AddNewCalendarEvent) {
+      DateTime dateCreated = DateTime.now().toUtc();
+      CalendarItem item = new CalendarItem();
+      item.name = event.name;
+      item.description =  event.description;
+      item.date = event.daySelected;
+      item.dateCreated = dateCreated;
+      CalendarItem.addCalendarItemToDb(item);
       Firestore.instance.collection('calendarEvents').add(
         {
           'name': event.name,
           'description': event.description,
           'date': event.daySelected,
+          'date_created': dateCreated,
           'userId' : 1
         }
       );

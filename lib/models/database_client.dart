@@ -44,14 +44,15 @@ class DatabaseClient {
 //    List allElements = await getAllDataInMemory(myclasses);
 //    print(allElements);
 
-//    await db.execute('''
-//        CREATE TABLE CalendarItem (
-//        id INTEGER PRIMARY KEY,
-//        name TEXT NOT NULL,
-//        description TEXT NOT NULL,
-//        date_created TEXT NOT NULL,
-//        date_accomplished TEXT)
-//    ''');
+    await db.execute('''
+        CREATE TABLE CalendarItem (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        date TEXT NOT NULL,
+        date_created TEXT NOT NULL,
+        date_accomplished TEXT)
+    ''');
 
     await db.execute('''
       CREATE TABLE UnmanagedItem (

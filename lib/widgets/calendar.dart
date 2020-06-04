@@ -107,7 +107,6 @@ class _CalendarState extends State<Calendar> {
             return MyDialogContent(bloc, state);
           }
         );
-
   }
 
 
