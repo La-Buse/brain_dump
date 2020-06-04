@@ -20,6 +20,10 @@ class _CalendarState extends State<Calendar> {
     return new BlocBuilder(
       bloc: calendarBloc,
         builder: (BuildContext context, CalendarState state) {
+          if (state is InitialCalendarEvent) {
+            calendarBloc.add(FetchItemsEvent());
+            return new Center(child: CircularProgressIndicator(),);
+          }
            Map<CalendarFormat,String> calendarFormat = new Map<CalendarFormat, String>();
            calendarFormat.putIfAbsent(CalendarFormat.month, () => 'month');
           return Scaffold(

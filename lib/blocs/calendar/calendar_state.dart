@@ -18,6 +18,11 @@ class InitialCalendarState extends CalendarState {
         super(allEvents, selectedDayEvents, selectedDay, newEventDate, name, description);
 }
 
+class CalendarStateInitialized extends CalendarState {
+  CalendarStateInitialized(Map<DateTime, List> allEvents, List selectedDayEvents, DateTime selectedDay, DateTime newEventDate, String name, String description) :
+        super(allEvents, selectedDayEvents, selectedDay, newEventDate, name, description);
+}
+
 //class InitializedCalendarState extends CalendarState {
 //  InitializedCalendarState()
 //}

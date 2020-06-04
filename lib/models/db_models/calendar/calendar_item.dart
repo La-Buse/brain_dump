@@ -2,6 +2,20 @@ import 'package:brain_dump/models/database_client.dart';
 import 'package:sqflite/sqflite.dart';
 
 final  dbTableName = 'CalendarItem';
+final monthDays = {
+  0: 31,
+  1: 28,
+  2: 31,
+  3: 30,
+  4: 31,
+  5: 30,
+  6:31,
+  7:31,
+  8:30,
+  9:31,
+  10:30,
+  11:31
+};
 
 class CalendarItem {
   int id;
@@ -20,19 +34,7 @@ class CalendarItem {
 
   }
 
-  static Future<int> addCalendarItemToDb(CalendarItem item) async {
-    var dbClass = DatabaseClient();
-    Database db = await dbClass.database;
-    item.id = await db.insert(dbTableName, item.toMap());
-    return item.id;
-  }
-
-  static Future<List<CalendarItem>> readAll(int parentId) async {
-    Database db = await DatabaseClient().database;
-    List<Map<String, dynamic>> result;
-    result = await db.rawQuery( 'SELECT * FROM CalendarItem');
-
-
+  static List<CalendarItem> dbToObjects(List<Map<String, dynamic>> result) {
     List<CalendarItem> calendarItems = [];
     result.forEach((map) {
       CalendarItem calendarItem = new CalendarItem();
@@ -40,6 +42,33 @@ class CalendarItem {
       calendarItems.add(calendarItem);
     });
     return calendarItems;
+  }
+
+  static Future<int> addCalendarItemToDb(CalendarItem item) async {
+    var dbClass = DatabaseClient();
+    Database db = await dbClass.database;
+    item.id = await db.insert(dbTableName, item.toMap());
+    return item.id;
+  }
+
+  static Future<List<CalendarItem>> getInitialEvents() async {
+    DateTime now = new DateTime.now().toUtc();
+    String begin = new DateTime(now.year, now.month, 1).toIso8601String();
+    String end = new DateTime(now.year, now.month, monthDays[now.month]).toIso8601String();
+
+
+    Database db = await DatabaseClient().database;
+    List<Map<String, dynamic>> result;
+    result = await db.rawQuery( 'SELECT * FROM CalendarItem WHERE date <= ? AND date >= ?', [begin, end]);
+    //select * from CalendarItem where date < "2020-06-03T12:00:00.000Z";
+    return dbToObjects(result);
+  }
+
+  static Future<List<CalendarItem>> readAll(int parentId) async {
+    Database db = await DatabaseClient().database;
+    List<Map<String, dynamic>> result;
+    result = await db.rawQuery( 'SELECT * FROM CalendarItem');
+    return dbToObjects(result);
   }
 
   fromMap(Map<String, dynamic> map) {

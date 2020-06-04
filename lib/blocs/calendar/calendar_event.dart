@@ -31,3 +31,7 @@ class AddNewCalendarEvent extends CalendarEvent {
     final DateTime daySelected;
     AddNewCalendarEvent(String name, String description, DateTime daySelected):this.name = name, this.description = description, this.daySelected = daySelected;
 }
+
+class FetchItemsEvent extends CalendarEvent {
+
+}
