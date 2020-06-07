@@ -51,15 +51,25 @@ class CalendarItem {
     return item.id;
   }
 
-  static Future<List<CalendarItem>> getInitialEvents() async {
-    DateTime now = new DateTime.now().toUtc();
-    String begin = new DateTime(now.year, now.month, 1).toIso8601String();
-    String end = new DateTime(now.year, now.month, monthDays[now.month]).toIso8601String();
+  static Future<List<CalendarItem>> getItemsBetweenTwoDate(DateTime from, DateTime to) async {
+    var dbResult =  await _getItemsBetweenTwoDate(from, to);
+    return dbToObjects(dbResult);
+  }
 
-
+  static Future<List<Map<String, dynamic>>> _getItemsBetweenTwoDate(DateTime from, DateTime to) async {
+    String _from = from.toIso8601String();
+    String _to = to.toIso8601String();
     Database db = await DatabaseClient().database;
     List<Map<String, dynamic>> result;
-    result = await db.rawQuery( 'SELECT * FROM CalendarItem WHERE date <= ? AND date >= ?', [begin, end]);
+    result = await db.rawQuery( 'SELECT * FROM CalendarItem WHERE date >= ? AND date <= ?', [_from, _to]);
+    return result;
+  }
+
+  static Future<List<CalendarItem>> getInitialItems() async {
+    DateTime now = new DateTime.now().toUtc();
+    DateTime from = new DateTime(now.year, now.month, 1);
+    DateTime to = new DateTime(now.year, now.month, monthDays[now.month]);
+    List<Map<String, dynamic>> result = await _getItemsBetweenTwoDate(from, to);
     //select * from CalendarItem where date < "2020-06-03T12:00:00.000Z";
     return dbToObjects(result);
   }

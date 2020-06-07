@@ -21,7 +21,7 @@ class _CalendarState extends State<Calendar> {
       bloc: calendarBloc,
         builder: (BuildContext context, CalendarState state) {
           if (state is InitialCalendarEvent) {
-            calendarBloc.add(FetchItemsEvent());
+            calendarBloc.add(FetchItemsEvent(null, null));
             return new Center(child: CircularProgressIndicator(),);
           }
            Map<CalendarFormat,String> calendarFormat = new Map<CalendarFormat, String>();
@@ -61,6 +61,13 @@ class _CalendarState extends State<Calendar> {
                   ),
                   calendarController: calendarController,
                   events: state.allEvents,
+
+                  onVisibleDaysChanged: (date1, date2, format) {
+                    print(date1);
+                    print(date2);
+                    print(format);
+                    calendarBloc.add(new FetchItemsEvent(date1, date2));
+                  },
                   onDaySelected: (date, events) {
                     calendarBloc.add(NewDaySelectedEvent(date));
                   },

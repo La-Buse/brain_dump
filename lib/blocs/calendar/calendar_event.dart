@@ -4,9 +4,7 @@ import 'package:meta/meta.dart';
 
 @immutable
 abstract class CalendarEvent {
-
     CalendarEvent();
-
 }
 
 class InitialCalendarEvent extends CalendarEvent {
@@ -33,5 +31,7 @@ class AddNewCalendarEvent extends CalendarEvent {
 }
 
 class FetchItemsEvent extends CalendarEvent {
-
+    final DateTime start;
+    final DateTime finish;
+    FetchItemsEvent(DateTime start, DateTime finish): this.start = start, this.finish = finish;
 }
