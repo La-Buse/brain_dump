@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:brain_dump/models/database_client.dart';
 import 'package:brain_dump/models/db_models/calendar/calendar_item.dart';
 import 'package:brain_dump/models/db_models/project/project.dart';
+import 'package:brain_dump/models/db_models/unmanaged_item/unmanaged_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import './bloc.dart';
@@ -34,12 +35,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       _events = {};
       for (int i=0; i<items.length; i++) {
         CalendarItem item = items[i];
-        if (_events[item.date] == null) {
-          List<String> newList = [item.name];
-          _events[item.date] = newList;
-        } else {
-          _events[item.date].add(item.name);
-        }
+        addItemToMap(item, _events);
       }
 //      items.forEach((element) {
 //        _events[element.date].add(element.name);
@@ -61,7 +57,9 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       item.description =  event.description;
       item.date = event.daySelected;
       item.dateCreated = dateCreated;
-      CalendarItem.addCalendarItemToDb(item);
+      int id = await CalendarItem.addCalendarItemToDb(item);
+      item.id = id;
+      addItemToMap(item, _events);
       Firestore.instance.collection('calendarEvents').add(
         {
           'name': event.name,
@@ -71,9 +69,19 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
           'userId' : 1
         }
       );
-      print(event.name);
+      yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description);
+
     }
 
+  }
+
+  void addItemToMap(CalendarItem item,  Map<DateTime, List> map) {
+    if (map[item.date] == null) {
+      List<String> newList = [item.name];
+      map[item.date] = newList;
+    } else {
+      map[item.date].add(item.name);
+    }
   }
 
 

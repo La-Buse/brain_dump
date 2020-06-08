@@ -20,7 +20,7 @@ class _CalendarState extends State<Calendar> {
     return new BlocBuilder(
       bloc: calendarBloc,
         builder: (BuildContext context, CalendarState state) {
-          if (state is InitialCalendarEvent) {
+          if (state is InitialCalendarState) {
             calendarBloc.add(FetchItemsEvent(null, null));
             return new Center(child: CircularProgressIndicator(),);
           }
@@ -69,7 +69,9 @@ class _CalendarState extends State<Calendar> {
                     calendarBloc.add(new FetchItemsEvent(date1, date2));
                   },
                   onDaySelected: (date, events) {
-                    calendarBloc.add(NewDaySelectedEvent(date));
+                    //selected date is in utc format
+                    DateTime utcDate = DateTime.utc(date.year, date.month, date.day);
+                    calendarBloc.add(NewDaySelectedEvent(utcDate));
                   },
                 ),
                 Expanded(child:_buildEventList(state))
@@ -183,8 +185,10 @@ class MyDialogContentState extends State<MyDialogContent> {
                           firstDate: DateTime(1900),
                           lastDate: DateTime(2030)
                       ).then((date) {
-                        dateSelected = date;
-                        calendarBloc.add(NewEventDateSelected(name, description, date));
+                        //selected date is not in utc format
+                        DateTime dateUtc = DateTime.utc(date.year, date.month, date.day, 0);
+                        dateSelected = dateUtc;
+                        calendarBloc.add(NewEventDateSelected(name, description, dateUtc));
                       });
                     },
                   ),
