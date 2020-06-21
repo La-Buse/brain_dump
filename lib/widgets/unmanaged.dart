@@ -25,7 +25,7 @@ class _InTrayState extends State<InTray> {
     return BlocBuilder(
         bloc: unmanagedItemBloc,
         builder: (BuildContext context, UnmanagedItemState state) {
-          if (state.getItemsLength() <= 0) {
+          if (state is InitialUnmanagedItemState) {
             unmanagedItemBloc.add(InitialEvent());
           }
           return new

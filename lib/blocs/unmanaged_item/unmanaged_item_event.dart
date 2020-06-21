@@ -4,30 +4,28 @@ import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 
 @immutable
-abstract class UnmanagedItemEvent {}
+abstract class UnmanagedItemEvent {
+  String name;
+  UnmanagedItem item;
+  int id;
+  UnmanagedItemEvent(String name, UnmanagedItem item, int id) :
+        this.name = name,
+        this.id = id,
+        this.item = item;
+}
 
 class SaveItemEvent extends UnmanagedItemEvent {
-  SaveItemEvent(String name) {
-    UnmanagedItem item = new UnmanagedItem();
-    item.setName(name);
-    DatabaseClient db = DatabaseClient();
-    UnmanagedItem.addUnmanagedItem(item);
-  }
+  SaveItemEvent(String name):super(name, null, null);
 }
 
 class UpdateItemEvent extends UnmanagedItemEvent {
-  UpdateItemEvent(UnmanagedItem item) {
-    DatabaseClient db = DatabaseClient();
-    UnmanagedItem.updateItem(item);
-  }
+  UpdateItemEvent(UnmanagedItem item) :super (null, item, null);
 }
 
 class InitialEvent extends UnmanagedItemEvent {
-
+  InitialEvent() : super(null, null, null);
 }
 
 class DeleteItemEvent extends UnmanagedItemEvent {
-  DeleteItemEvent(int id) {
-    DatabaseClient().delete(id, 'UnmanagedItem');
-  }
+  DeleteItemEvent(int id) : super(null, null, id);
 }
