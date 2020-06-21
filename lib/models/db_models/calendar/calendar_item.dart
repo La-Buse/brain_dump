@@ -3,12 +3,12 @@ import 'package:sqflite/sqflite.dart';
 
 final  dbTableName = 'CalendarItem';
 final monthDays = {
-  0: 31,
-  1: 28,
-  2: 31,
-  3: 30,
-  4: 31,
-  5: 30,
+  0:31,
+  1:28,
+  2:31,
+  3:30,
+  4:31,
+  5:30,
   6:31,
   7:31,
   8:30,
@@ -104,7 +104,7 @@ class CalendarItem {
     if (this.dateCreated != null) {
       map['date_created'] = this.dateCreated.toIso8601String();
     } else {
-      map['date_created'] = DateTime.now().toIso8601String();
+      map['date_created'] = DateTime.now().toUtc().toIso8601String();
     }
     if (this.dateAccomplished != null) {
       map['date_accomplished'] = this.dateAccomplished.toIso8601String();
