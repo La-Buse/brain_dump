@@ -54,6 +54,13 @@ class NextAction extends NextActionInterface {
     action.id = await db.insert(dbTableName, action.toMap());
     return action.id;
   }
+  static Future<Null> updateNextActionDbFields(NextAction action) async {
+    var dbClass = DatabaseClient();
+    Database db = await dbClass.database;
+    Map<String,dynamic> actionMap = action.toMap();
+
+    action.id = await db.update(dbTableName, actionMap, where: 'id = ?', whereArgs: [action.id]);
+  }
 
   static Future<int> deleteNextAction(int id) async {
     Database db = await DatabaseClient().database;
@@ -84,7 +91,7 @@ class NextAction extends NextActionInterface {
     if (this.dateCreated != null) {
       map['date_created'] = this.dateCreated.toIso8601String();
     } else {
-      map['date_created'] = DateTime.now().toIso8601String();
+      map['date_created'] = DateTime.now().toUtc().toIso8601String();
     }
     if (this.dateAccomplished != null) {
       map['date_accomplished'] = this.dateAccomplished.toIso8601String();

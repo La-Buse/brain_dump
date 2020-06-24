@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:brain_dump/models/database_client.dart';
-import 'package:brain_dump/models/db_models/calendar/calendar_item.dart';
-import 'package:brain_dump/models/db_models/project/project.dart';
-import 'package:brain_dump/models/db_models/unmanaged_item/unmanaged_item.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:brain_dump/models/db_models/calendar/calendar_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import './bloc.dart';
 import 'bloc.dart';
 
@@ -60,7 +58,9 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       int id = await CalendarItem.addCalendarItemToDb(item);
       item.id = id;
       addItemToMap(item, _events);
-      Firestore.instance.collection('calendarEvents').add(
+      FirebaseUser user = await FirebaseAuth.instance.currentUser();
+      String userId = user.uid;
+      Firestore.instance.collection('users/' + userId + 'calendar_events').add(
         {
           'name': event.name,
           'description': event.description,

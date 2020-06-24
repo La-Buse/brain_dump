@@ -81,7 +81,7 @@ class NextActionContext extends NextActionInterface {
     if (this.dateCreated != null) {
       map['date_created'] = this.dateCreated.toIso8601String();
     } else {
-      map['date_created'] = DateTime.now().toIso8601String();
+      map['date_created'] = DateTime.now().toUtc().toIso8601String();
     }
     if (this.parentId != null) {
       map['parent_id'] = this.parentId;

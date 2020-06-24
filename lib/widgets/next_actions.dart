@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:brain_dump/blocs/next_actions/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+
 class NextActions extends StatefulWidget {
   UnmanagedItem unmanagedItem;
   NextActions({
@@ -29,7 +30,6 @@ class _NextActionsState extends State<NextActions> {
 
   UnmanagedItem item;
   final nextActionsBloc = NextActionsBloc();
-
   final tooltipMessage = '''Action : The next physical action that will 
 bring you closer to the completion of a task. 
 Good: Call Gary to set merger meeting. Bad: Plan merger.
