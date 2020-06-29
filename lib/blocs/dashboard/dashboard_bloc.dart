@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import './bloc.dart';
 import 'bloc.dart';
 
-class AuthenticationBloc  extends Bloc<DashboardEvent, DashboardState> {
+class DashboardBloc  extends Bloc<DashboardEvent, DashboardState> {
 
 
   @override
@@ -16,7 +16,7 @@ class AuthenticationBloc  extends Bloc<DashboardEvent, DashboardState> {
   Stream<DashboardState> mapEventToState(
       DashboardEvent event,
       ) async* {
-    yield InitialDashboardState();
+    yield CloudDataSuccesfullyFetched();
   }
 
 

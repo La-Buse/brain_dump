@@ -6,11 +6,12 @@ import 'package:path/path.dart';
 import 'dart:io';
 import 'package:async/async.dart';
 import 'package:brain_dump/models/db_models/next_actions/next_action.dart';
+import 'package:brain_dump/models/db_function_v22.dart';
 
 //'/data/user/0/braindump.brain_dump/app_flutter/database.db'
 
 final int launchVersion = 8;
-final int currentVersion = 21;
+final int currentVersion = 23;
 
 class DatabaseClient {
   Database _database;
@@ -34,9 +35,18 @@ class DatabaseClient {
   }
 
   Future<Null> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < newVersion) { // switch to " oldVersion < newVersion" to apply modifications
-      await _onCreate(db, newVersion);
+    //when no database exists, oldVersion is 0
+    if (oldVersion == 0) {
+      _onCreate(db, 1);
+    } else if (oldVersion < newVersion) { // switch to " oldVersion < newVersion" to apply modifications
+      upgradeActions(db);
     }
+//    await _onCreate(db, newVersion);
+  }
+
+  Future<Null> upgradeActions(Database db) async {
+    List<Map<String, dynamic>>  calendarMap = await DbFunctionsVersion22.readCalendarItems(db);
+    print(calendarMap);
   }
 
   Future<Null> _onCreate(Database db, int version) async {
@@ -76,7 +86,19 @@ class DatabaseClient {
         date_created TEXT NOT NULL,
         date_accomplished TEXT)
     ''');
+    await db.execute('''
+        CREATE TABLE TablesSyncTime (
+          last_sync TEXT NOT NULL
+        )
+    ''');
 
+  }
+
+  Future<Null> _dropTables(Database db, List<String> tables) async {
+    for (int i=0; i<tables.length; i++) {
+      String tableName = tables[i];
+      await db.execute('DROP table ' + tableName);
+    }
   }
 
 //  Future<List> getAllDataInMemory(List classes) async {

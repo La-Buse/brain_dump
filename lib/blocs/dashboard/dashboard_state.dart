@@ -8,3 +8,6 @@ abstract class DashboardState {
 class InitialDashboardState extends DashboardState {
 
 }
+class CloudDataSuccesfullyFetched extends DashboardState {
+
+}
