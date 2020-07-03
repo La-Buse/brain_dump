@@ -60,7 +60,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       addItemToMap(item, _events);
       FirebaseUser user = await FirebaseAuth.instance.currentUser();
       String userId = user.uid;
-      Firestore.instance.collection('users/' + userId + 'calendar_events').add(
+      Firestore.instance.collection('users/' + userId + '/calendar_events').add(
         {
           'name': event.name,
           'description': event.description,

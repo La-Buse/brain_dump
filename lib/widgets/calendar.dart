@@ -172,7 +172,7 @@ class MyDialogContentState extends State<MyDialogContent> {
                       },
                       child: new Text('Confirm'))
                 ],
-              content: ListView(
+              content: Column(
                 children: [
                   new Text('Selected date : ' +
                       (state.newEventDate == null ? 'No date selected.' : state.newEventDate.toIso8601String())),
