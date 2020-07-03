@@ -20,7 +20,6 @@ class NextAction extends NextActionInterface {
 
   static Future<List<NextAction>> readAll(int parentId) async {
     Database db = await DatabaseClient().database;
-    var test = await db.rawQuery('SELECT * FROM NextAction');
     List<Map<String, dynamic>> result;
     if (parentId == null || parentId == -1) {
       result = await db.rawQuery( 'SELECT * FROM NextAction WHERE parent_id = -1');

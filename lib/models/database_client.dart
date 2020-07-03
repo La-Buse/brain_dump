@@ -88,6 +88,7 @@ class DatabaseClient {
     ''');
     await db.execute('''
         CREATE TABLE TablesSyncTime (
+          table_name TEXT NOT NULL,
           last_sync TEXT NOT NULL
         )
     ''');
@@ -99,6 +100,17 @@ class DatabaseClient {
       String tableName = tables[i];
       await db.execute('DROP table ' + tableName);
     }
+  }
+  Future<DateTime> getSyncTimeForTable(String tableName) async {
+    Database db = await DatabaseClient().database;
+    var result = await db.rawQuery( 'SELECT * FROM TablesSyncTime WHERE table_name = ?', [tableName]);
+    if (result.length > 0) {
+      DateTime lastSync = DateTime.parse(result[0]["last_sync"]);
+      return lastSync;
+    } else {
+      return null;
+    }
+
   }
 
 //  Future<List> getAllDataInMemory(List classes) async {

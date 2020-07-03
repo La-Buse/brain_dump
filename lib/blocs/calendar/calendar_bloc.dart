@@ -66,7 +66,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
           'description': event.description,
           'date': event.daySelected,
           'date_created': dateCreated,
-          'userId' : 1
+          'userId' : userId
         }
       );
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description);

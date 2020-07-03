@@ -37,7 +37,8 @@ class _CalendarState extends State<Calendar> {
                         dateNameDescriptionDialog(context,
                           state,
                             calendarBloc,
-                            ''
+                            '',
+                            false
                         );
                       },
                       itemBuilder: (BuildContext context) {
@@ -74,7 +75,7 @@ class _CalendarState extends State<Calendar> {
                     calendarBloc.add(NewDaySelectedEvent(utcDate));
                   },
                 ),
-                Expanded(child:_buildEventList(state))
+                Expanded(child:_buildEventList(state, context, calendarBloc, dateNameDescriptionDialog))
               ],
             )
           );
@@ -83,10 +84,10 @@ class _CalendarState extends State<Calendar> {
 
   }
 
-  Widget _buildEventList(CalendarState state) {
+  Widget _buildEventList(CalendarState thisState, BuildContext thisContext, CalendarBloc thisBloc, Function editCallback) {
 
     return ListView(
-      children: state.selectedDayEvents
+      children: thisState.selectedDayEvents
           .map((event) => Container(
         decoration: BoxDecoration(
           border: Border.all(width: 0.8),
@@ -96,6 +97,26 @@ class _CalendarState extends State<Calendar> {
         child: ListTile(
           title: Text(event.toString()),
           onTap: () => print('$event tapped!'),
+          trailing: PopupMenuButton(
+            onSelected: (String selection) {
+              if (selection == 'Delete') {
+
+              } else if (selection == 'Edit') {
+                editCallback(thisContext, thisState, thisBloc, '',true);
+
+              } else if (selection == 'Mark as done') {}
+            },
+            itemBuilder: (BuildContext context) {
+              {
+                return ['Delete', 'Edit', 'Mark as done'].map((String selection) {
+                  return PopupMenuItem<String>(
+                    value: selection,
+                    child: Text(selection),
+                  );
+                }).toList();
+              }
+            },
+          ),
         ),
       ))
           .toList(),
@@ -112,12 +133,13 @@ class _CalendarState extends State<Calendar> {
       BuildContext context,
       CalendarState state,
       CalendarBloc bloc,
-      String inputField
+      String inputField,
+      bool editButtonSelected
       ) {
         return showDialog(
           context: context,
           builder: (BuildContext context) {
-            return MyDialogContent(bloc, state);
+            return MyDialogContent(bloc, state, editButtonSelected);
           }
         );
   }
@@ -125,26 +147,38 @@ class _CalendarState extends State<Calendar> {
 
 }
 class MyDialogContent extends StatefulWidget {
-  MyDialogContent(CalendarBloc bloc, CalendarState state, {
+  MyDialogContent(CalendarBloc bloc, CalendarState state, bool editButtonSelected, {
     Key key,
-  }) :  this.calendarBloc = bloc, this.calendarState = state, super(key: key);
+  }) :  this.calendarBloc = bloc, this.calendarState = state, this.editButtonSelected=editButtonSelected,super(key: key);
 
+  CalendarEvent createNewEvent(String name, String description, DateTime timeUtc) {
+    return AddNewCalendarEvent(name, description, timeUtc);
+  }
 
   CalendarState calendarState;
   CalendarBloc calendarBloc;
+  bool editButtonSelected;
   @override
   State<StatefulWidget> createState() {
-    return new MyDialogContentState(this.calendarBloc, this.calendarState);
+    if (this.editButtonSelected) {
+      return new MyDialogContentState(this.calendarBloc, this.calendarState, 'Edit', createNewEvent);
+    } else {
+      return new MyDialogContentState(this.calendarBloc, this.calendarState, 'Confirm', createNewEvent);
+    }
   }
 }
 
 class MyDialogContentState extends State<MyDialogContent> {
-  MyDialogContentState(CalendarBloc calendarBloc, CalendarState state){
+  MyDialogContentState(CalendarBloc calendarBloc, CalendarState state, String actionButtonName, Function actionButtonCallback){
     this.calendarBloc = calendarBloc;
     this.calendarState = state;
+    this.actionButtonCallback = actionButtonCallback;
+    this.actionButtonName = actionButtonName;
   }
   CalendarBloc calendarBloc;
   CalendarState calendarState;
+  String actionButtonName;
+  Function actionButtonCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -168,9 +202,9 @@ class MyDialogContentState extends State<MyDialogContent> {
                   new FlatButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        calendarBloc.add(AddNewCalendarEvent(name, description, dateSelected));
+                        calendarBloc.add(this.actionButtonCallback(name, description, dateSelected));
                       },
-                      child: new Text('Confirm'))
+                      child: new Text(this.actionButtonName))
                 ],
               content: Column(
                 children: [
@@ -224,6 +258,32 @@ class MyDialogContentState extends State<MyDialogContent> {
 
 
       }
+    );
+  }
+
+  static Future<Null> confirmationDialog (BuildContext context, String message, Function callback) {
+    return showDialog(
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return new AlertDialog(
+            contentPadding: EdgeInsets.all(20.0),
+            title: new Text(message),
+            content: new Text(message),
+            actions: [
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text('Cancel')),
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    callback();
+                  },
+                  child: new Text('Confirm'))
+            ]);
+      },
+      context: context,
     );
   }
 }
