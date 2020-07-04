@@ -64,6 +64,11 @@ class CalendarItem {
     result = await db.rawQuery( 'SELECT * FROM CalendarItem WHERE date >= ? AND date <= ?', [_from, _to]);
     return result;
   }
+  static Future<int> deleteItem(CalendarItem item) async {
+    Database db = await DatabaseClient().database;
+
+    return await db.delete(dbTableName, where: 'id = ?', whereArgs: [item.id]);
+  }
 
   static Future<List<CalendarItem>> getInitialItems() async {
     DateTime now = new DateTime.now().toUtc();

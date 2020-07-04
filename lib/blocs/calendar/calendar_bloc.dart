@@ -11,7 +11,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   static DateTime now = DateTime.now();
   static DateTime _selectedDay = new DateTime.utc(now.year, now.month, now.day, 12);
   static Map<DateTime, List> _events = {
-          _selectedDay.subtract(Duration(days: 30)): ['Event A0', 'Event B0', 'Event C0'],
+
   };
   List _selectedDayEvents = _events[_selectedDay] ?? [];
   DateTime _newEventDate = _selectedDay;
@@ -23,6 +23,8 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   Stream<CalendarState> mapEventToState(
       CalendarEvent event,
   ) async* {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    String userId = user.uid;
     if (event is FetchItemsEvent) {
       List<CalendarItem> items = [];
       if (event.start == null) {
@@ -35,12 +37,8 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
         CalendarItem item = items[i];
         addItemToMap(item, _events);
       }
-//      items.forEach((element) {
-//        _events[element.date].add(element.name);
-//      });
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, '','');
     } else if (event is NewDaySelectedEvent) {
-//      DateTime newDay = event.daySelected;
        _selectedDay = event.daySelected;
       _selectedDayEvents = _events[event.daySelected] ?? [];
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, '', '');
@@ -58,29 +56,41 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       int id = await CalendarItem.addCalendarItemToDb(item);
       item.id = id;
       addItemToMap(item, _events);
-      FirebaseUser user = await FirebaseAuth.instance.currentUser();
-      String userId = user.uid;
       Firestore.instance.collection('users/' + userId + '/calendar_events').add(
         {
           'name': event.name,
           'description': event.description,
           'date': event.daySelected,
           'date_created': dateCreated,
-          'userId' : userId
+          'id' : id
         }
       );
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description);
 
+    } else if (event is DeleteCalendarEvent) {
+      CalendarItem.deleteItem(event.item);
+      var deletedDocuments = await Firestore.instance.collection('users/' + userId + '/calendar_events').where("id", isEqualTo: event.item.id).getDocuments();
+      deletedDocuments.documents.forEach((element) async {
+        await Firestore.instance.collection('users/' + userId + '/calendar_events').document(element.documentID).delete();
+      });
+      List dayEvents = _events[event.item.date];
+      for (int i=0; i<dayEvents.length; i++) {
+        CalendarItem current = dayEvents[i];
+        if (current.id == event.item.id) {
+          dayEvents.remove(current);
+        }
+      }
+      yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, '', '');
     }
 
   }
 
   void addItemToMap(CalendarItem item,  Map<DateTime, List> map) {
     if (map[item.date] == null) {
-      List<String> newList = [item.name];
+      List<CalendarItem> newList = [item];
       map[item.date] = newList;
     } else {
-      map[item.date].add(item.name);
+      map[item.date].add(item);
     }
   }
 

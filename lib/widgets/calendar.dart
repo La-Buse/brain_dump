@@ -95,15 +95,14 @@ class _CalendarState extends State<Calendar> {
         ),
         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         child: ListTile(
-          title: Text(event.toString()),
+          title: Text(event.name),
           onTap: () => print('$event tapped!'),
           trailing: PopupMenuButton(
             onSelected: (String selection) {
               if (selection == 'Delete') {
-
+                thisBloc.add(DeleteCalendarEvent(event));
               } else if (selection == 'Edit') {
-                editCallback(thisContext, thisState, thisBloc, '',true);
-
+                editCallback(thisContext, thisState, thisBloc, '', true);
               } else if (selection == 'Mark as done') {}
             },
             itemBuilder: (BuildContext context) {
@@ -154,6 +153,9 @@ class MyDialogContent extends StatefulWidget {
   CalendarEvent createNewEvent(String name, String description, DateTime timeUtc) {
     return AddNewCalendarEvent(name, description, timeUtc);
   }
+  CalendarEvent editEvent(String name, String description, DateTime timeUtc) {
+    return new EditCalendarEvent(name, description, timeUtc);
+  }
 
   CalendarState calendarState;
   CalendarBloc calendarBloc;
@@ -161,6 +163,7 @@ class MyDialogContent extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     if (this.editButtonSelected) {
+//      this.calendarBloc.add()
       return new MyDialogContentState(this.calendarBloc, this.calendarState, 'Edit', createNewEvent);
     } else {
       return new MyDialogContentState(this.calendarBloc, this.calendarState, 'Confirm', createNewEvent);

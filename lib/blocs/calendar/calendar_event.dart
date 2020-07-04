@@ -1,4 +1,4 @@
-import 'package:brain_dump/models/db_models/unmanaged_item/unmanaged_item.dart';
+import 'package:brain_dump/models/db_models/calendar/calendar_item.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -30,8 +30,20 @@ class AddNewCalendarEvent extends CalendarEvent {
     AddNewCalendarEvent(String name, String description, DateTime daySelected):this.name = name, this.description = description, this.daySelected = daySelected;
 }
 
+class EditCalendarEvent extends CalendarEvent {
+    final String name;
+    final String description;
+    final DateTime daySelected;
+    EditCalendarEvent(String name, String description, DateTime daySelected):this.name = name, this.description = description, this.daySelected = daySelected;
+}
+
 class FetchItemsEvent extends CalendarEvent {
     final DateTime start;
     final DateTime finish;
     FetchItemsEvent(DateTime start, DateTime finish): this.start = start, this.finish = finish;
+}
+
+class DeleteCalendarEvent extends CalendarEvent {
+    final CalendarItem item;
+    DeleteCalendarEvent(CalendarItem item): this.item = item;
 }
