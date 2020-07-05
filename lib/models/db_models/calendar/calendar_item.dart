@@ -70,6 +70,14 @@ class CalendarItem {
     return await db.delete(dbTableName, where: 'id = ?', whereArgs: [item.id]);
   }
 
+  static Future<Null> updateCalendarItemDbFields(CalendarItem item) async {
+    var dbClass = DatabaseClient();
+    Database db = await dbClass.database;
+    Map<String,dynamic> calendarMap = item.toMap();
+
+    item.id = await db.update(dbTableName, calendarMap, where: 'id = ?', whereArgs: [item.id]);
+  }
+
   static Future<List<CalendarItem>> getInitialItems() async {
     DateTime now = new DateTime.now().toUtc();
     DateTime from = new DateTime(now.year, now.month, 1);

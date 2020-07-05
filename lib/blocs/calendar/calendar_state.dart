@@ -19,7 +19,7 @@ class InitialCalendarState extends CalendarState {
 }
 
 class CalendarStateInitialized extends CalendarState {
-  CalendarStateInitialized(Map<DateTime, List> allEvents, List selectedDayEvents, DateTime selectedDay, DateTime newEventDate, String name, String description) :
+  CalendarStateInitialized(Map<DateTime, List> allEvents, List selectedDayEvents, DateTime selectedDay, DateTime newEventDate, String name, String description, int id) :
         super(allEvents, selectedDayEvents, selectedDay, newEventDate, name, description);
 }
 

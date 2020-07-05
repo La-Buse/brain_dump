@@ -27,14 +27,13 @@ class AddNewCalendarEvent extends CalendarEvent {
     final String name;
     final String description;
     final DateTime daySelected;
-    AddNewCalendarEvent(String name, String description, DateTime daySelected):this.name = name, this.description = description, this.daySelected = daySelected;
+    final CalendarItem calendarItem;
+    AddNewCalendarEvent(String name, String description, DateTime daySelected, CalendarItem item):this.name = name, this.description = description, this.daySelected = daySelected, this.calendarItem = item;
 }
 
 class EditCalendarEvent extends CalendarEvent {
-    final String name;
-    final String description;
-    final DateTime daySelected;
-    EditCalendarEvent(String name, String description, DateTime daySelected):this.name = name, this.description = description, this.daySelected = daySelected;
+    final CalendarItem item;
+    EditCalendarEvent(CalendarItem item): this.item=item;
 }
 
 class FetchItemsEvent extends CalendarEvent {
@@ -46,4 +45,9 @@ class FetchItemsEvent extends CalendarEvent {
 class DeleteCalendarEvent extends CalendarEvent {
     final CalendarItem item;
     DeleteCalendarEvent(CalendarItem item): this.item = item;
+}
+
+class GetEditedEventInfos extends CalendarEvent {
+    final CalendarItem item;
+    GetEditedEventInfos(CalendarItem item): this.item = item;
 }

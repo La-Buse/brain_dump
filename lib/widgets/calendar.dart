@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:brain_dump/blocs/calendar/bloc.dart';
+import 'package:brain_dump/models/db_models/calendar/calendar_item.dart';
 
 import '../blocs/calendar/bloc.dart';
 
@@ -38,7 +39,8 @@ class _CalendarState extends State<Calendar> {
                           state,
                             calendarBloc,
                             '',
-                            false
+                            null,
+                            false,
                         );
                       },
                       itemBuilder: (BuildContext context) {
@@ -102,7 +104,9 @@ class _CalendarState extends State<Calendar> {
               if (selection == 'Delete') {
                 thisBloc.add(DeleteCalendarEvent(event));
               } else if (selection == 'Edit') {
-                editCallback(thisContext, thisState, thisBloc, '', true);
+//                this.calendarBloc.add(GetEditedEventInfos(event));
+                editCallback(thisContext, thisState, thisBloc, '', event, true);
+
               } else if (selection == 'Mark as done') {}
             },
             itemBuilder: (BuildContext context) {
@@ -133,12 +137,13 @@ class _CalendarState extends State<Calendar> {
       CalendarState state,
       CalendarBloc bloc,
       String inputField,
+      CalendarItem item,
       bool editButtonSelected
       ) {
         return showDialog(
           context: context,
           builder: (BuildContext context) {
-            return MyDialogContent(bloc, state, editButtonSelected);
+            return MyDialogContent(bloc, state, editButtonSelected, item);
           }
         );
   }
@@ -146,43 +151,47 @@ class _CalendarState extends State<Calendar> {
 
 }
 class MyDialogContent extends StatefulWidget {
-  MyDialogContent(CalendarBloc bloc, CalendarState state, bool editButtonSelected, {
+  MyDialogContent(CalendarBloc bloc, CalendarState state, bool editButtonSelected, CalendarItem item, {
     Key key,
-  }) :  this.calendarBloc = bloc, this.calendarState = state, this.editButtonSelected=editButtonSelected,super(key: key);
+  }) :  this.calendarBloc = bloc,
+        this.calendarState = state,
+        this.editButtonSelected=editButtonSelected,
+        this.calendarItem= item,
+        super(key: key);
 
-  CalendarEvent createNewEvent(String name, String description, DateTime timeUtc) {
-    return AddNewCalendarEvent(name, description, timeUtc);
+  CalendarEvent createNewEvent(String name, String description, DateTime timeUtc, CalendarItem item) {
+    return AddNewCalendarEvent(name, description, timeUtc, item);
   }
-  CalendarEvent editEvent(String name, String description, DateTime timeUtc) {
-    return new EditCalendarEvent(name, description, timeUtc);
+  CalendarEvent editEvent(String name, String description, DateTime timeUtc, CalendarItem item) {
+    return new EditCalendarEvent(item);
   }
-
+  CalendarItem calendarItem;
   CalendarState calendarState;
   CalendarBloc calendarBloc;
   bool editButtonSelected;
   @override
   State<StatefulWidget> createState() {
     if (this.editButtonSelected) {
-//      this.calendarBloc.add()
-      return new MyDialogContentState(this.calendarBloc, this.calendarState, 'Edit', createNewEvent);
+      return new MyDialogContentState(this.calendarBloc, this.calendarState, 'Edit', editEvent, this.calendarItem);
     } else {
-      return new MyDialogContentState(this.calendarBloc, this.calendarState, 'Confirm', createNewEvent);
+      return new MyDialogContentState(this.calendarBloc, this.calendarState, 'Confirm', createNewEvent, this.calendarItem);
     }
   }
 }
 
 class MyDialogContentState extends State<MyDialogContent> {
-  MyDialogContentState(CalendarBloc calendarBloc, CalendarState state, String actionButtonName, Function actionButtonCallback){
+  MyDialogContentState(CalendarBloc calendarBloc, CalendarState state, String actionButtonName, Function actionButtonCallback, CalendarItem item){
     this.calendarBloc = calendarBloc;
     this.calendarState = state;
     this.actionButtonCallback = actionButtonCallback;
     this.actionButtonName = actionButtonName;
+    this.calendarItem = item;
   }
   CalendarBloc calendarBloc;
   CalendarState calendarState;
   String actionButtonName;
   Function actionButtonCallback;
-
+  CalendarItem calendarItem;
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
@@ -193,6 +202,9 @@ class MyDialogContentState extends State<MyDialogContent> {
         String name = state.name;
         DateTime dateSelected = state.newEventDate;
         String description = state.description;
+        if (this.calendarItem == null) {
+          this.calendarItem = new CalendarItem();
+        }
         return AlertDialog(
                           title: new Text(
                 state.newEventDate == null ? 'No date selected.' : state.newEventDate.toIso8601String()),
@@ -205,7 +217,7 @@ class MyDialogContentState extends State<MyDialogContent> {
                   new FlatButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        calendarBloc.add(this.actionButtonCallback(name, description, dateSelected));
+                        calendarBloc.add(this.actionButtonCallback(name, description, dateSelected, this.calendarItem));
                       },
                       child: new Text(this.actionButtonName))
                 ],
@@ -225,16 +237,18 @@ class MyDialogContentState extends State<MyDialogContent> {
                         //selected date is not in utc format
                         DateTime dateUtc = DateTime.utc(date.year, date.month, date.day, 0);
                         dateSelected = dateUtc;
+                        this.calendarItem.date = dateUtc;
                         calendarBloc.add(NewEventDateSelected(name, description, dateUtc));
                       });
                     },
                   ),
                   new TextFormField(
-                      initialValue: name,
+                      initialValue: this.calendarItem.name,
                       decoration: new InputDecoration(
                         labelText: "Name",
                       ),
                       onChanged: (String str) {
+                        this.calendarItem.name = str;
                         name = str;
                       }),
                   new SingleChildScrollView(
@@ -242,15 +256,18 @@ class MyDialogContentState extends State<MyDialogContent> {
                     reverse: true,
 
                     // here's the actual text box
-                    child: new TextField(
+                    child: new TextFormField(
+                      initialValue: this.calendarItem.description,
                       keyboardType: TextInputType.multiline,
                       maxLines: null, //grow automatically
                       decoration: new InputDecoration(
                         labelText: 'Description',
                       ),
                       onChanged: (newDescription) {
+                        this.calendarItem.description = newDescription;
                         description = newDescription;
                       },
+
                     ),
                     // ends the actual text box
 
