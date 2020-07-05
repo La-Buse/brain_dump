@@ -9,7 +9,7 @@ import 'bloc.dart';
 
 class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   static DateTime now = DateTime.now();
-  static DateTime _selectedDay = new DateTime.utc(now.year, now.month, now.day, 12);
+  static DateTime _selectedDay = new DateTime.utc(now.year, now.month, now.day, 0);
   static Map<DateTime, List> _events = {
 
   };
@@ -48,14 +48,18 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description);
     } else if (event is AddNewCalendarEvent) {
       DateTime dateCreated = DateTime.now().toUtc();
+
       CalendarItem item = new CalendarItem();
       item.name = event.name;
       item.description =  event.description;
-      item.date = event.daySelected;
+      item.date = event.daySelected;;
       item.dateCreated = dateCreated;
       int id = await CalendarItem.addCalendarItemToDb(item);
       item.id = id;
       addItemToMap(item, _events);
+      if (_selectedDay == item.date) {
+        _selectedDayEvents.add(item);
+      }
       Firestore.instance.collection('users/' + userId + '/calendar_events').add(
         {
           'name': event.name,
