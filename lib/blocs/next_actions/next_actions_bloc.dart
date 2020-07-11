@@ -28,10 +28,11 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
     String userId = user.uid;
     if (event is AddActionEvent) {
       NextAction addedAction = NextAction();
+      addedAction.id = new DateTime.now().millisecondsSinceEpoch;
       addedAction.name = event.actionName;
       addedAction.parentId = event.parentId;
       addedAction.dateCreated = DateTime.now().toUtc();
-      addedAction.id = await NextAction.addNextActionToDb(addedAction);
+      await NextAction.addNextActionToDb(addedAction);
 
       DocumentReference ref = await Firestore.instance.collection('users/' + userId + '/next_actions').add(
           {
@@ -89,10 +90,11 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       yield InitializedNextActionsState(this.allActions, event.parentId);
     } else if (event is AddContextEvent) {
       NextActionContext context = new NextActionContext();
+      context.id = new DateTime.now().millisecondsSinceEpoch;
       context.name = event.contextName;
       context.parentId = event.parentId;
       context.dateCreated = DateTime.now().toUtc();
-      context.id = await NextActionContext.addActionContext(context);
+      await NextActionContext.addActionContext(context);
       FirebaseUser user = await FirebaseAuth.instance.currentUser();
       String userId = user.uid;
       DocumentReference ref = await Firestore.instance.collection('users/' + userId + '/next_actions_contexts').add(

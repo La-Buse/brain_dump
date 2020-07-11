@@ -23,6 +23,7 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
         }
         else if (event is SaveItemEvent) {
           UnmanagedItem item = new UnmanagedItem();
+          item.id = new DateTime.now().millisecondsSinceEpoch;
           item.setName(event.name);
           item.dateCreated = new DateTime.now().toUtc();
           DatabaseClient db = DatabaseClient();

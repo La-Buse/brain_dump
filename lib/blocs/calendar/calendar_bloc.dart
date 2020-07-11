@@ -58,11 +58,10 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       item.description =  event.description;
       item.date = event.daySelected;;
       item.dateCreated = dateCreated;
-      int id = await CalendarItem.addCalendarItemToDb(item);
-      item.id = id;
+      CalendarItem.addCalendarItemToDb(item);
       addItemToMap(item, _events);
       if (_selectedDay == item.date) {
-        _selectedDayEvents.add(item);
+        _selectedDayEvents = _events[_selectedDay];
       }
       Firestore.instance.collection('users/' + userId + '/calendar_events').add(
         {
@@ -70,7 +69,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
           'description': event.description,
           'date': event.daySelected,
           'date_created': dateCreated,
-          'id' : id
+          'id' : item.id
         }
       );
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description, -1);

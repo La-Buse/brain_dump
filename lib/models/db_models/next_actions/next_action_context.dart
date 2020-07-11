@@ -11,7 +11,7 @@ class NextActionContext extends NextActionInterface {
   DateTime dateCreated;
 
   String getName() {
-    return this.name + ' ' + this.id.toString();
+    return this.name;
   }
 
   int getId() {
