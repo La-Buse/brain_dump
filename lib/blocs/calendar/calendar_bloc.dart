@@ -39,7 +39,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
         CalendarItem item = items[i];
         addItemToMap(item, _events);
       }
-      _selectedDayEvents = _events[_selectedDay];
+      _selectedDayEvents = _events[_selectedDay] ?? [];
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, '','', -1);
     } else if (event is NewDaySelectedEvent) {
        _selectedDay = event.daySelected;
@@ -49,9 +49,11 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       //event name and event description are known here because the user is in the process of creating a new event
       _newEventDate = event.daySelected;
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description,-1);
+      /** ADD NEW EVENT **/
     } else if (event is AddNewCalendarEvent) {
       DateTime dateCreated = DateTime.now().toUtc();
       CalendarItem item = new CalendarItem();
+      item.id = new DateTime.now().millisecondsSinceEpoch;
       item.name = event.name;
       item.description =  event.description;
       item.date = event.daySelected;;
@@ -72,7 +74,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
         }
       );
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description, -1);
-
+      /** DELETE EVENT **/
     } else if (event is DeleteCalendarEvent) {
       CalendarItem.deleteItem(event.item);
       var deletedDocuments = await Firestore.instance.collection('users/' + userId + '/calendar_events').where("id", isEqualTo: event.item.id).getDocuments();
@@ -87,6 +89,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
         }
       }
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, '', '', -1);
+      /** EDIT EVENT **/
     } else if (event is EditCalendarEvent) {
       CalendarItem item = event.item;
       var modifiedDocuments = await Firestore.instance.collection('users/' + userId + '/calendar_events').where("id", isEqualTo: event.item.id).getDocuments();

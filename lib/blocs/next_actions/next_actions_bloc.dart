@@ -47,6 +47,12 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
 
         //item went from being an unmanaged item to becoming a next action, so it must be deleted from Unmanaged item
         await DatabaseClient().delete(event.item.id, 'UnmanagedItem');
+        var ref = await Firestore.instance.collection('users/' + userId + '/unmanaged_items').getDocuments();
+        var documents = ref.documents.where((f) {return f['id'] == event.item.id;}).toList();
+        documents.forEach((element) {
+          Firestore.instance.collection('users/' + userId + '/unmanaged_items').document(element.documentID).delete();
+        });
+
       }
       this.allActions.add(addedAction);
       yield InitializedNextActionsState(this.allActions, state.parentId);

@@ -21,12 +21,16 @@ class DashboardBloc  extends Bloc<DashboardEvent, DashboardState> {
       FirebaseUser user = await FirebaseAuth.instance.currentUser();
       String userId = user.uid;
       DateTime lastSyncNextActions = await DatabaseClient().getSyncTimeForTable("NextAction");
-      Future<QuerySnapshot> nextActionDocuments;
+      QuerySnapshot nextActionDocuments;
       if (lastSyncNextActions != null) {
-        nextActionDocuments = Firestore.instance.collection('users/' + userId + '/next_actions').where("", isEqualTo: "1").getDocuments();
+        nextActionDocuments = await Firestore.instance.collection('users/' + userId + '/next_actions').where("date_created", isGreaterThanOrEqualTo: lastSyncNextActions).getDocuments();
       } else {
-        nextActionDocuments = Firestore.instance.collection('users/' + userId + '/next_actions').getDocuments();
+        nextActionDocuments = await Firestore.instance.collection('users/' + userId + '/next_actions').getDocuments();
       }
+//      int test = new DateTime.now().millisecondsSinceEpoch;
+      nextActionDocuments.documents.forEach((element) {
+
+      });
 //      var firestoreActions = await Firestore.instance.collection('users/' + userId + '/next_actions').getDocuments();
       yield CloudDataSuccesfullyFetched();
     }
