@@ -5,6 +5,7 @@ class UnmanagedItem {
   int id;
   String name;
   DateTime dateCreated;
+  String firestoreId;
 
   UnmanagedItem();
 

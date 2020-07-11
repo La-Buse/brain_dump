@@ -9,6 +9,7 @@ class NextActionContext extends NextActionInterface {
   int parentId;
   String name;
   DateTime dateCreated;
+  String firestoreId;
 
   String getName() {
     return this.name;
@@ -22,7 +23,6 @@ class NextActionContext extends NextActionInterface {
     Database db = await DatabaseClient().database;
     List<Map<String, dynamic>> result;
 
-    var test = await db.rawQuery('SELECT * FROM NextActionContext');
     if (parentId == -1 || parentId == null) {
       result = await db.rawQuery('SELECT * FROM NextActionContext WHERE parent_id = -1');
     } else {

@@ -57,6 +57,7 @@ class DatabaseClient {
     await db.execute('''
         CREATE TABLE CalendarItem (
         id INTEGER PRIMARY KEY,
+        firestore_id TEXT,
         name TEXT NOT NULL,
         description TEXT NOT NULL,
         date TEXT NOT NULL,

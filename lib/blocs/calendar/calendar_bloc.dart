@@ -58,12 +58,9 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       item.description =  event.description;
       item.date = event.daySelected;;
       item.dateCreated = dateCreated;
-      CalendarItem.addCalendarItemToDb(item);
-      addItemToMap(item, _events);
-      if (_selectedDay == item.date) {
-        _selectedDayEvents = _events[_selectedDay];
-      }
-      Firestore.instance.collection('users/' + userId + '/calendar_events').add(
+
+
+      var ref = await Firestore.instance.collection('users/' + userId + '/calendar_events').add(
         {
           'name': event.name,
           'description': event.description,
@@ -72,14 +69,22 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
           'id' : item.id
         }
       );
+      item.firestoreId = ref.documentID;
+      CalendarItem.addCalendarItemToDb(item);
+      addItemToMap(item, _events);
+      if (_selectedDay == item.date) {
+        _selectedDayEvents = _events[_selectedDay];
+      }
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description, -1);
       /** DELETE EVENT **/
     } else if (event is DeleteCalendarEvent) {
-      CalendarItem.deleteItem(event.item);
-      var deletedDocuments = await Firestore.instance.collection('users/' + userId + '/calendar_events').where("id", isEqualTo: event.item.id).getDocuments();
-      deletedDocuments.documents.forEach((element) async {
-        await Firestore.instance.collection('users/' + userId + '/calendar_events').document(element.documentID).delete();
-      });
+      CalendarItem toBeDeleted = await CalendarItem.getItemById(event.item.id);
+      await CalendarItem.deleteItem(event.item);
+      await Firestore.instance.collection('users/' + userId + '/calendar_events').document(toBeDeleted.firestoreId).delete();
+//      var deletedDocuments = await Firestore.instance.collection('users/' + userId + '/calendar_events').where("id", isEqualTo: event.item.id).getDocuments();
+//      deletedDocuments.documents.forEach((element) async {
+//        await Firestore.instance.collection('users/' + userId + '/calendar_events').document(element.documentID).delete();
+//      });
       List dayEvents = _events[event.item.date];
       for (int i=0; i<dayEvents.length; i++) {
         CalendarItem current = dayEvents[i];

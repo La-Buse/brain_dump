@@ -1,3 +1,4 @@
+import 'package:brain_dump/blocs/workflow/bloc.dart';
 import 'package:brain_dump/models/database_client.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -24,12 +25,8 @@ class CalendarItem {
   DateTime date;
   DateTime dateCreated;
   DateTime dateAccomplished;
-//  CalendarItem(String name, String description, DateTime date, DateTime dateCreated) {
-//    this.name = name;
-//    this.description = description;
-//    this.date = date;
-//    this.dateCreated = dateCreated;
-//  }
+  String firestoreId;
+
   CalendarItem() {
 
   }
@@ -86,6 +83,14 @@ class CalendarItem {
     //select * from CalendarItem where date < "2020-06-03T12:00:00.000Z";
     return dbToObjects(result);
   }
+  static Future<CalendarItem> getItemById(int id) async {
+    var dbClass = DatabaseClient();
+    Database db = await dbClass.database;
+    var result = await  db.rawQuery( 'SELECT * FROM CalendarItem WHERE id = ?', [id]);
+    CalendarItem foundItem = new CalendarItem();
+    foundItem.fromMap(result[0]);
+    return foundItem;
+  }
 
   static Future<List<CalendarItem>> readAll(int parentId) async {
     Database db = await DatabaseClient().database;
@@ -96,6 +101,7 @@ class CalendarItem {
 
   fromMap(Map<String, dynamic> map) {
     this.id = map['id'];
+    this.firestoreId = map['firestore_id'];
     this.name = map['name'];
     this.description = map['description'];
     this.date = DateTime.parse(map['date']);
@@ -121,6 +127,9 @@ class CalendarItem {
     }
     if (this.dateAccomplished != null) {
       map['date_accomplished'] = this.dateAccomplished.toIso8601String();
+    }
+    if (this.firestoreId != null) {
+      map['firestore_id'] = this.firestoreId;
     }
 
     return map;

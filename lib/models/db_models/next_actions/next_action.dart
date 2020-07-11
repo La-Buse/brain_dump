@@ -9,6 +9,7 @@ class NextAction extends NextActionInterface {
   String name;
   DateTime dateCreated;
   DateTime dateAccomplished;
+  String firestoreId;
 
   String getName() {
     return this.name;

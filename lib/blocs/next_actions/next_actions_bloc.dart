@@ -32,8 +32,6 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       addedAction.name = event.actionName;
       addedAction.parentId = event.parentId;
       addedAction.dateCreated = DateTime.now().toUtc();
-      await NextAction.addNextActionToDb(addedAction);
-
       DocumentReference ref = await Firestore.instance.collection('users/' + userId + '/next_actions').add(
           {
             'name': addedAction.name,
@@ -43,6 +41,8 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
             'date_created': addedAction.dateCreated,
           }
       );
+//      ref.documentID
+      await NextAction.addNextActionToDb(addedAction);
 
       if (event.item != null) {
 
