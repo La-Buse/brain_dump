@@ -80,7 +80,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
     } else if (event is DeleteCalendarEvent) {
       CalendarItem toBeDeleted = await CalendarItem.getItemById(event.item.id);
       await CalendarItem.deleteItem(event.item);
-      await Firestore.instance.collection('users/' + userId + '/calendar_events').document(toBeDeleted.firestoreId).delete();
+      Firestore.instance.collection('users/' + userId + '/calendar_events').document(toBeDeleted.firestoreId).delete();
 //      var deletedDocuments = await Firestore.instance.collection('users/' + userId + '/calendar_events').where("id", isEqualTo: event.item.id).getDocuments();
 //      deletedDocuments.documents.forEach((element) async {
 //        await Firestore.instance.collection('users/' + userId + '/calendar_events').document(element.documentID).delete();
