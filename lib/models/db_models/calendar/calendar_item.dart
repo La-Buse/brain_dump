@@ -88,7 +88,11 @@ class CalendarItem {
     Database db = await dbClass.database;
     var result = await  db.rawQuery( 'SELECT * FROM CalendarItem WHERE id = ?', [id]);
     CalendarItem foundItem = new CalendarItem();
-    foundItem.fromMap(result[0]);
+    try {
+      foundItem.fromMap(result[0]);
+    } catch (Exception) {
+      return null;
+    }
     return foundItem;
   }
 

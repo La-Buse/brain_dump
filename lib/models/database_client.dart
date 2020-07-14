@@ -50,9 +50,6 @@ class DatabaseClient {
   }
 
   Future<Null> _onCreate(Database db, int version) async {
-//    List<dynamic> myclasses = [ NextAction] ;
-//    List allElements = await getAllDataInMemory(myclasses);
-//    print(allElements);
 
     await db.execute('''
         CREATE TABLE CalendarItem (
@@ -68,12 +65,14 @@ class DatabaseClient {
     await db.execute('''
       CREATE TABLE UnmanagedItem (
         id INTEGER PRIMARY KEY,
+        firestore_id TEXT,
         name TEXT NOT NULL,
         date_created TEXT NOT NULL)
     ''');
     await db.execute('''
         CREATE TABLE NextAction (
         id INTEGER PRIMARY KEY,
+        firestore_id TEXT,
         parent_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         date_created TEXT NOT NULL,
@@ -82,6 +81,7 @@ class DatabaseClient {
     await db.execute('''
         CREATE TABLE NextActionContext (
         id INTEGER PRIMARY KEY,
+        firestore_id TEXT,
         parent_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         date_created TEXT NOT NULL,

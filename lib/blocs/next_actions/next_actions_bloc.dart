@@ -32,7 +32,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       addedAction.name = event.actionName;
       addedAction.parentId = event.parentId;
       addedAction.dateCreated = DateTime.now().toUtc();
-      DocumentReference ref = await Firestore.instance.collection('users/' + userId + '/next_actions').add(
+      Firestore.instance.collection('users/' + userId + '/next_actions').add(
           {
             'name': addedAction.name,
             'id': addedAction.id,
@@ -40,7 +40,22 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
             'date_accomplished': addedAction.dateAccomplished,
             'date_created': addedAction.dateCreated,
           }
-      );
+      ).then((value) async {
+        NextAction toBeUpdated = await NextAction.getActionById(addedAction.id);
+        if (toBeUpdated != null) {
+          toBeUpdated.firestoreId = value.documentID;
+          NextAction.editAction(toBeUpdated);
+          Firestore.instance.collection('users/' + userId + '/next_actions').document(value.documentID).setData({
+            'name': toBeUpdated.name,
+            'id': toBeUpdated.id,
+            'parent_id': toBeUpdated.parentId,
+            'date_accomplished': toBeUpdated.dateAccomplished,
+            'date_created': toBeUpdated.dateCreated,
+          });
+        } else {
+          Firestore.instance.collection('users/' + userId + '/next_actions').document(value.documentID).delete();
+        }
+      });
 //      ref.documentID
       await NextAction.addNextActionToDb(addedAction);
 
@@ -59,32 +74,27 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       yield InitializedNextActionsState(this.allActions, state.parentId);
 
     } else if (event is DeleteActionEvent) {
+      NextAction toBeDeleted = await NextAction.getActionById(event.id);
+      if (toBeDeleted.firestoreId != null) {
+        Firestore.instance.collection('users/' + userId + '/next_actions').document(toBeDeleted.firestoreId).delete();
+      }
       await NextAction.deleteNextAction(event.id);
-      var ref = await Firestore.instance.collection('users/' + userId + '/next_actions').getDocuments();
-      var documents = ref.documents.where((f) {return f['id'] == event.id;}).toList();
-      documents.forEach((element) {
-        Firestore.instance.collection('users/' + userId + '/next_actions').document(element.documentID).delete();
-      });
       allActions.removeWhere((action) {return !action.isContext() && action.getId() == event.id; });
       yield InitializedNextActionsState(this.allActions, state.parentId);
     } else if (event is DeleteContextEvent) {
-      List<int> contextIds = await _getAllContextIdsAssociatedWithContext(event.id);
-      var firestoreActionContexts = await Firestore.instance.collection('users/' + userId + '/next_actions_contexts').getDocuments();
-      var firestoreActions = await Firestore.instance.collection('users/' + userId + '/next_actions').getDocuments();
-      contextIds.forEach((int id) async {
-        await NextActionContext.deleteActionContext(id);
-        var documents = firestoreActionContexts.documents.where((f) {return f['id'] == id;}).toList();
-        documents.forEach((element) {
-          Firestore.instance.collection('users/' + userId + '/next_actions_contexts').document(element.documentID).delete();
-        });
+      List<NextActionContext> contexts = await _getAllContextsAssociatedWithContext(event.id);
+      contexts.forEach((NextActionContext context) async {
+        await NextActionContext.deleteActionContext(context.id);
+        if (context.firestoreId != null) {
+          Firestore.instance.collection('users/' + userId + '/next_actions_contexts').document(context.firestoreId).delete();
+        }
       });
-      List<int> actionIds = await _getAllActionIdsAssociatedWithContext(contextIds);
-      actionIds.forEach((int id) async {
-        await NextAction.deleteNextAction(id);
-        var documents = firestoreActions.documents.where((f) {return f['id'] == id;}).toList();
-        documents.forEach((element) {
-          Firestore.instance.collection('users/' + userId + '/next_actions').document(element.documentID).delete();
-        });
+      List<NextAction> actions = await _getAllActionsAssociatedWithContext(contexts);
+      actions.forEach((NextAction action) async {
+        await NextAction.deleteNextAction(action.id);
+        if (action.firestoreId != null) {
+          Firestore.instance.collection('users/' + userId + '/next_actions').document(action.firestoreId).delete();
+        }
       });
       await _setAllActions(event.parentId);
       yield InitializedNextActionsState(this.allActions, event.parentId);
@@ -95,41 +105,58 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       context.parentId = event.parentId;
       context.dateCreated = DateTime.now().toUtc();
       await NextActionContext.addActionContext(context);
-      FirebaseUser user = await FirebaseAuth.instance.currentUser();
-      String userId = user.uid;
-      DocumentReference ref = await Firestore.instance.collection('users/' + userId + '/next_actions_contexts').add(
+      Firestore.instance.collection('users/' + userId + '/next_actions_contexts').add(
           {
             'name': context.name,
             'id': context.id,
             'parent_id': context.parentId,
             'date_created': context.dateCreated,
           }
-      );
+      ).then((value) async {
+        NextActionContext toBeUpdated = await NextActionContext.getContextById(context.id);
+        if (toBeUpdated != null) {
+          toBeUpdated.firestoreId = value.documentID;
+          NextActionContext.editActionContext(toBeUpdated);
+          Firestore.instance.collection('users/' + userId + '/next_actions_contexts').document(toBeUpdated.firestoreId).setData({
+            'name': toBeUpdated.name,
+            'id': toBeUpdated.id,
+            'parent_id': toBeUpdated.parentId,
+            'date_created': toBeUpdated.dateCreated,
+          });
+        } else {
+          //delete if item was deleted while offline
+          Firestore.instance.collection('users/' + userId + '/next_actions_contexts').document(value.documentID).delete();
+        }
+      });
       this.allActions.add(context);
       yield InitializedNextActionsState(this.allActions, state.parentId);
     } else if (event is EditContextEvent) {
-      NextActionContext.editActionContext(event.id, event.contextName);
+      NextActionContext toBeUpdated = await NextActionContext.getContextById(event.id);
+      toBeUpdated.name = event.contextName;
+      NextActionContext.editActionContext(toBeUpdated);
       NextActionContext edited = this.allActions.where((x) {
         return x.isContext() && x.getId() == event.id;
       }).toList()[0];
       edited.setName(event.contextName);
-      var ref = await Firestore.instance.collection('users/' + userId + '/next_actions_contexts').getDocuments();
-      var documents = ref.documents.where((f) {return f['id'] == event.id;}).toList();
-      documents.forEach((element) {
-        Firestore.instance.collection('users/' + userId + '/next_actions_contexts').document(element.documentID).updateData({"name": event.contextName});
-      });
+      if (toBeUpdated.firestoreId != null) {
+        Firestore.instance.collection('users/' + userId + '/next_actions_contexts')
+            .document(toBeUpdated.firestoreId)
+            .updateData({"name": event.contextName});
+      }
       yield InitializedNextActionsState(this.allActions, state.parentId);
     } else if (event is EditActionEvent) {
-      NextAction.editAction(event.id, event.actionName);
+      NextAction toBeUpdated = await NextAction.getActionById(event.id);
+      toBeUpdated.name = event.actionName;
+      NextAction.editAction(toBeUpdated);
       NextAction edited = this.allActions.where((x) {
         return !x.isContext() && x.getId() == event.id;
       }).toList()[0];
       edited.name = event.actionName;
-      var ref = await Firestore.instance.collection('users/' + userId + '/next_actions').getDocuments();
-      var documents = ref.documents.where((f) {return f['id'] == event.id;}).toList();
-      documents.forEach((element) {
-        Firestore.instance.collection('users/' + userId + '/next_actions').document(element.documentID).updateData({"name": event.actionName});
-      });
+      if (toBeUpdated.firestoreId != null) {
+        Firestore.instance.collection('users/' + userId + '/next_actions')
+            .document(toBeUpdated.firestoreId)
+            .updateData({"name": event.actionName});
+      }
       yield InitializedNextActionsState(this.allActions, state.parentId);
       //TODO edit in firebase
     } else if (event is ChangeContextEvent) {
@@ -163,36 +190,30 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
     this.allActions = new List.from(actions)..addAll(contexts);
   }
 
-  Future<List<int>> _getAllContextIdsAssociatedWithContext(int contextId) async {
-    List<int> result = [];
-    List<int> toCheck = [contextId];
+  Future<List<NextActionContext>> _getAllContextsAssociatedWithContext(int contextId) async {
+    List<NextActionContext> result = [];
+    List<NextActionContext> toCheck = [await NextActionContext.getContextById(contextId)];
     while (toCheck.length > 0) {
-      int current = toCheck.removeLast();
-      result.add(current);
-      List<NextActionContext> newContexts = await NextActionContext.readContextsFromDb(current);
-      List<int> contextIds = [];
-      contextIds = newContexts.map((NextActionContext c) {
-        return c.id;
-      }).toList();
-
-      result..addAll(contextIds);
+      NextActionContext current = toCheck.removeLast();
+      result.add(await NextActionContext.getContextById(current.id));
+      List<NextActionContext> newContexts = await NextActionContext.readContextsFromDb(current.id);
+      result..addAll(newContexts);
       result = result.toSet().toList();
-      toCheck..addAll(contextIds);
+      toCheck..addAll(newContexts);
       toCheck = toCheck.toSet().toList();
     }
     return result;
   }
 
-  Future<List<int>> _getAllActionIdsAssociatedWithContext(List<int> contextIds) async {
-    List<int> result = [];
-    while (contextIds.length > 0) {
-      int current = contextIds.removeLast();
-      List<NextAction> actions = await NextAction.readAll(current);
+  Future<List<NextAction>> _getAllActionsAssociatedWithContext(List<NextActionContext> contexts) async {
+    List<NextAction> result = [];
+    while (contexts.length > 0) {
+      NextActionContext current = contexts.removeLast();
+      List<NextAction> actions = await NextAction.readAll(current.id);
       result..addAll(actions.map((NextAction a) {
-        return a.id;
+        return a;
       }));
     }
     return result;
   }
-
 }

@@ -37,16 +37,25 @@ class NextAction extends NextActionInterface {
     return actions;
   }
 
-  static Future<NextAction> editAction(int id, String actionName) async {
+  static Future<NextAction> editAction(NextAction action) async {
     Database db = await DatabaseClient().database;
-    NextAction context = new NextAction();
-    List<Map<String, dynamic>> result = await db.rawQuery(
-        'SELECT * FROM NextAction WHERE id = ?', [id]);
-    context.fromMap(result[0]);
-    context.name = actionName;
-    db.update('NextAction', context.toMap(), where: 'id = ?', whereArgs: [id] );
-    return context;
+    db.update('NextAction', action.toMap(), where: 'id = ?', whereArgs: [action.id] );
+    return action;
   }
+
+  static Future<NextAction> getActionById(int id) async {
+    var dbClass = DatabaseClient();
+    Database db = await dbClass.database;
+    var result = await  db.rawQuery( 'SELECT * FROM NextAction WHERE id = ?', [id]);
+    NextAction foundItem = new NextAction();
+    try {
+      foundItem.fromMap(result[0]);
+    } catch (Exception) {
+      return null;
+    }
+    return foundItem;
+  }
+
 
   static Future<int> addNextActionToDb(NextAction action) async {
     var dbClass = DatabaseClient();

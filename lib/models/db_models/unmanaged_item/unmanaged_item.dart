@@ -46,6 +46,19 @@ class UnmanagedItem {
     return item;
   }
 
+  static Future<UnmanagedItem> getItemById(int id) async {
+    var dbClass = DatabaseClient();
+    Database db = await dbClass.database;
+    var result = await  db.rawQuery( 'SELECT * FROM UnmanagedItem WHERE id = ?', [id]);
+    UnmanagedItem foundItem = new UnmanagedItem();
+    try {
+      foundItem.fromMap(result[0]);
+    } catch (Exception) {
+      return null;
+    }
+    return foundItem;
+  }
+
   static Future<List<UnmanagedItem>> readUnmanagedItems() async {
     Database myDatabase = await DatabaseClient().database;
     List<Map<String, dynamic>> result =
