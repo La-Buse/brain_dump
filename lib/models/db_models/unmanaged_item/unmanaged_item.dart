@@ -13,6 +13,7 @@ class UnmanagedItem {
     this.id = map['id'];
     this.name = map['name'];
     this.dateCreated = DateTime.parse(map['date_created']);
+    this.firestoreId = map['firestore_id'];
   }
 
   setName(String newName) {
@@ -30,6 +31,9 @@ class UnmanagedItem {
       map['date_created'] = this.dateCreated.toIso8601String();
     } else {
       map['date_created'] = DateTime.now().toUtc().toIso8601String();
+    }
+    if (this.firestoreId != null) {
+      map['firestore_id'] = this.firestoreId;
     }
     return map;
   }

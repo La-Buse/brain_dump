@@ -37,7 +37,7 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
               }
           ).then((value) async {
             UnmanagedItem toBeUpdated = await UnmanagedItem.getItemById(item.id);
-            if (toBeUpdated != null) {
+            if (toBeUpdated == null) {
               //this means the item was both added and deleted while offline
               value.delete();
             } else {
@@ -46,7 +46,7 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
               Firestore.instance.collection('users/' + userId + '/unmanaged_items')
                   .document(toBeUpdated.firestoreId)
                   .updateData({
-                    'name': event.item.name,
+                    'name': toBeUpdated.name,
                   });
               UnmanagedItem.updateItem(toBeUpdated);
             }
@@ -61,7 +61,7 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
             UnmanagedItem toBeDeleted = await UnmanagedItem.getItemById(event.id);
             DatabaseClient().delete(event.id, 'UnmanagedItem');
             if (toBeDeleted.firestoreId != null) {
-              Firestore.instance.collection('users/' + userId + '/calendar_events').document(toBeDeleted.firestoreId).delete();
+              Firestore.instance.collection('users/' + userId + '/unmanaged_items').document(toBeDeleted.firestoreId).delete();
             }
         }
         UnmanagedItemState state = InitializedUnmanagedItemState();

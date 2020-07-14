@@ -81,6 +81,7 @@ class NextAction extends NextActionInterface {
     this.parentId = map['parent_id'];
     this.name = map['name'];
     this.dateCreated = DateTime.parse(map['date_created']);
+    this.firestoreId = map['firestore_id'];
     if (map['date_accomplished'] != null) {
       this.dateAccomplished = DateTime.parse(map['date_accomplished']); //TODO mettre ca dans une fonction ou utiliser une librarie qui gere les objets comme du monde
     }
@@ -109,6 +110,9 @@ class NextAction extends NextActionInterface {
       map['parent_id'] = this.parentId;
     } else {
       map['parent_id'] = -1;
+    }
+    if (this.firestoreId != null) {
+      map['firestore_id'] = this.firestoreId;
     }
     return map;
   }

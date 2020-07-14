@@ -69,10 +69,10 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
           'id' : item.id
         }
       ).then((value) async {
-        item.firestoreId = value.documentID;
         CalendarItem toBeUpdated = await CalendarItem.getItemById(item.id);
         if (toBeUpdated != null) {
-          CalendarItem.updateCalendarItemDbFields(item);
+          toBeUpdated.firestoreId = value.documentID;
+          CalendarItem.updateCalendarItemDbFields(toBeUpdated);
           //in case item was created and modified while offline
           Firestore.instance.collection('users/' + userId + '/calendar_events').document(value.documentID).setData({
             'id':item.id,
@@ -121,7 +121,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
           'date_created':item.dateCreated
         });
       }
-      await CalendarItem.updateCalendarItemDbFields(item);
+      await CalendarItem.updateCalendarItemDbFields(toBeUpdated);
       List eventList = _events[item.date];
       for (int i=0; i<eventList.length; i++) {
         CalendarItem current = eventList[i];

@@ -51,7 +51,7 @@ class NextActionContext extends NextActionInterface {
 
   static Future<NextActionContext> editActionContext(NextActionContext context) async {
     Database db = await DatabaseClient().database;
-    db.update('NextAction', context.toMap(), where: 'id = ?', whereArgs: [context.id] );
+    db.update('NextActionContext', context.toMap(), where: 'id = ?', whereArgs: [context.id] );
     return context;
   }
 
@@ -73,6 +73,7 @@ class NextActionContext extends NextActionInterface {
     this.parentId = map['parent_id'];
     this.name = map['name'];
     this.dateCreated = DateTime.parse(map['date_created']);
+    this.firestoreId = map['firestore_id'];
   }
 
   setName(String newName) {
@@ -95,6 +96,9 @@ class NextActionContext extends NextActionInterface {
       map['parent_id'] = this.parentId;
     } else {
       map['parent_id'] = -1;
+    }
+    if (this.firestoreId != null) {
+      map['firestore_id'] = this.firestoreId;
     }
     return map;
   }
