@@ -8,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
 
-
   @override
   UnmanagedItemState get initialState => InitialUnmanagedItemState();
 
@@ -29,13 +28,8 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
           item.setName(event.name);
           item.dateCreated = new DateTime.now().toUtc();
           item = await UnmanagedItem.addUnmanagedItem(item);
-          Firestore.instance.collection('users/' + userId + '/unmanaged_items').add(
-              {
-                'name': item.name,
-                'id': item.id,
-                'date_created': item.dateCreated,
-              }
-          ).then((value) async {
+          Firestore.instance.collection('users/' + userId + '/unmanaged_items')
+              .add(item.toFirestoreMap()).then((value) async {
             UnmanagedItem toBeUpdated = await UnmanagedItem.getItemById(item.id);
             if (toBeUpdated == null) {
               //this means the item was both added and deleted while offline
@@ -45,9 +39,7 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
               //update in case item was created and updated offline
               Firestore.instance.collection('users/' + userId + '/unmanaged_items')
                   .document(toBeUpdated.firestoreId)
-                  .updateData({
-                    'name': toBeUpdated.name,
-                  });
+                  .setData(toBeUpdated.toMap());
               UnmanagedItem.updateItem(toBeUpdated);
             }
           });

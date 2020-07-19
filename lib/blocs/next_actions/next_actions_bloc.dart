@@ -33,25 +33,13 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       addedAction.parentId = event.parentId;
       addedAction.dateCreated = DateTime.now().toUtc();
       Firestore.instance.collection('users/' + userId + '/next_actions').add(
-          {
-            'name': addedAction.name,
-            'id': addedAction.id,
-            'parent_id': addedAction.parentId,
-            'date_accomplished': addedAction.dateAccomplished,
-            'date_created': addedAction.dateCreated,
-          }
+          addedAction.toFirestoreMap()
       ).then((value) async {
         NextAction toBeUpdated = await NextAction.getActionById(addedAction.id);
         if (toBeUpdated != null) {
           toBeUpdated.firestoreId = value.documentID;
           NextAction.editAction(toBeUpdated);
-          Firestore.instance.collection('users/' + userId + '/next_actions').document(value.documentID).setData({
-            'name': toBeUpdated.name,
-            'id': toBeUpdated.id,
-            'parent_id': toBeUpdated.parentId,
-            'date_accomplished': toBeUpdated.dateAccomplished,
-            'date_created': toBeUpdated.dateCreated,
-          });
+          Firestore.instance.collection('users/' + userId + '/next_actions').document(value.documentID).setData(toBeUpdated.toFirestoreMap());
         } else {
           Firestore.instance.collection('users/' + userId + '/next_actions').document(value.documentID).delete();
         }
@@ -106,23 +94,13 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       context.dateCreated = DateTime.now().toUtc();
       await NextActionContext.addActionContext(context);
       Firestore.instance.collection('users/' + userId + '/next_actions_contexts').add(
-          {
-            'name': context.name,
-            'id': context.id,
-            'parent_id': context.parentId,
-            'date_created': context.dateCreated,
-          }
+          context.toFirestoreMap()
       ).then((value) async {
         NextActionContext toBeUpdated = await NextActionContext.getContextById(context.id);
         if (toBeUpdated != null) {
           toBeUpdated.firestoreId = value.documentID;
           NextActionContext.editActionContext(toBeUpdated);
-          Firestore.instance.collection('users/' + userId + '/next_actions_contexts').document(toBeUpdated.firestoreId).setData({
-            'name': toBeUpdated.name,
-            'id': toBeUpdated.id,
-            'parent_id': toBeUpdated.parentId,
-            'date_created': toBeUpdated.dateCreated,
-          });
+          Firestore.instance.collection('users/' + userId + '/next_actions_contexts').document(toBeUpdated.firestoreId).setData(toBeUpdated.toFirestoreMap());
         } else {
           //delete if item was deleted while offline
           Firestore.instance.collection('users/' + userId + '/next_actions_contexts').document(value.documentID).delete();
@@ -141,7 +119,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
       if (toBeUpdated.firestoreId != null) {
         Firestore.instance.collection('users/' + userId + '/next_actions_contexts')
             .document(toBeUpdated.firestoreId)
-            .updateData({"name": event.contextName});
+            .updateData(toBeUpdated.toFirestoreMap());
       }
       yield InitializedNextActionsState(this.allActions, state.parentId);
     } else if (event is EditActionEvent) {

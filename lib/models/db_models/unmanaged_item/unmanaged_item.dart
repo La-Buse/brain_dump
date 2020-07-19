@@ -1,7 +1,8 @@
 import 'package:brain_dump/models/database_client.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:brain_dump/models/firestore_synchronized.dart';
 
-class UnmanagedItem {
+class UnmanagedItem extends FirestoreSynchronized {
   int id;
   String name;
   DateTime dateCreated;
@@ -74,5 +75,12 @@ class UnmanagedItem {
       items.add(item);
     });
     return items;
+  }
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'name': this.name,
+      'id': this.id,
+      'date_created': this.dateCreated,
+    };
   }
 }

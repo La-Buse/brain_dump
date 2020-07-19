@@ -1,9 +1,11 @@
 import 'package:brain_dump/models/db_models/next_actions/next_action_interface.dart';
 import 'package:brain_dump/models/database_client.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:brain_dump/models/firestore_synchronized.dart';
 final  dbTableName = 'NextAction';
 
-class NextAction extends NextActionInterface {
+
+class NextAction extends FirestoreSynchronized implements NextActionInterface {
   int id;
   int parentId;
   String name;
@@ -119,5 +121,15 @@ class NextAction extends NextActionInterface {
 
   bool isContext() {
     return false;
+  }
+
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'name': this.name,
+      'id': this.id,
+      'parent_id': this.parentId,
+      'date_accomplished': this.dateAccomplished,
+      'date_created': this.dateCreated,
+    };
   }
 }

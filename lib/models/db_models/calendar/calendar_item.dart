@@ -1,6 +1,7 @@
 import 'package:brain_dump/blocs/workflow/bloc.dart';
 import 'package:brain_dump/models/database_client.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:brain_dump/models/firestore_synchronized.dart';
 
 final  dbTableName = 'CalendarItem';
 final monthDays = {
@@ -18,7 +19,7 @@ final monthDays = {
   11:31
 };
 
-class CalendarItem {
+class CalendarItem extends FirestoreSynchronized {
   int id;
   String name;
   String description;
@@ -137,6 +138,16 @@ class CalendarItem {
     }
 
     return map;
+  }
+
+  Map<String, dynamic> toFirestoreMap() {
+    return {
+      'id':this.id,
+      'description':this.description,
+      'name': this.name,
+      'date':this.date,
+      'date_created':this.dateCreated
+    };
   }
 
 }

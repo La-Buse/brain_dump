@@ -56,31 +56,18 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       item.id = new DateTime.now().millisecondsSinceEpoch;
       item.name = event.name;
       item.description =  event.description;
-      item.date = event.daySelected;;
+      item.date = event.daySelected;
       item.dateCreated = dateCreated;
 
-
       Firestore.instance.collection('users/' + userId + '/calendar_events').add(
-        {
-          'name': event.name,
-          'description': event.description,
-          'date': event.daySelected,
-          'date_created': dateCreated,
-          'id' : item.id
-        }
+        item.toFirestoreMap()
       ).then((value) async {
         CalendarItem toBeUpdated = await CalendarItem.getItemById(item.id);
         if (toBeUpdated != null) {
           toBeUpdated.firestoreId = value.documentID;
           CalendarItem.updateCalendarItemDbFields(toBeUpdated);
           //in case item was created and modified while offline
-          Firestore.instance.collection('users/' + userId + '/calendar_events').document(value.documentID).setData({
-            'id':item.id,
-            'description':item.description,
-            'name': item.name,
-            'date':item.date,
-            'date_created':item.dateCreated
-          });
+          Firestore.instance.collection('users/' + userId + '/calendar_events').document(value.documentID).setData(toBeUpdated.toFirestoreMap());
         } else {
           //this means the item was both added and deleted while offline
           await value.delete();
@@ -113,13 +100,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       CalendarItem item = event.item;
       CalendarItem toBeUpdated = await CalendarItem.getItemById(event.item.id);
       if (toBeUpdated.firestoreId != null) {
-        Firestore.instance.collection('users/' + userId + '/calendar_events').document(toBeUpdated.firestoreId).setData({
-          'id':item.id,
-          'description':item.description,
-          'name': item.name,
-          'date':item.date,
-          'date_created':item.dateCreated
-        });
+        Firestore.instance.collection('users/' + userId + '/calendar_events').document(toBeUpdated.firestoreId).setData(item.toFirestoreMap());
       }
       await CalendarItem.updateCalendarItemDbFields(toBeUpdated);
       List eventList = _events[item.date];
