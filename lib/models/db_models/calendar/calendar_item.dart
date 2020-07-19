@@ -1,5 +1,6 @@
 import 'package:brain_dump/blocs/workflow/bloc.dart';
 import 'package:brain_dump/models/database_client.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:brain_dump/models/firestore_synchronized.dart';
 
@@ -42,11 +43,11 @@ class CalendarItem extends FirestoreSynchronized {
     return calendarItems;
   }
 
-  static Future<int> addCalendarItemToDb(CalendarItem item) async {
+  Future<int> addItemToLocalDb() async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;
-    item.id = await db.insert(dbTableName, item.toMap());
-    return item.id;
+    this.id = await db.insert(dbTableName, this.toMap());
+    return this.id;
   }
 
   static Future<List<CalendarItem>> getItemsBetweenTwoDate(DateTime from, DateTime to) async {
@@ -68,12 +69,11 @@ class CalendarItem extends FirestoreSynchronized {
     return await db.delete(dbTableName, where: 'id = ?', whereArgs: [item.id]);
   }
 
-  static Future<Null> updateCalendarItemDbFields(CalendarItem item) async {
+  Future<void> updateItemDbFields() async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;
-    Map<String,dynamic> calendarMap = item.toMap();
-
-    item.id = await db.update(dbTableName, calendarMap, where: 'id = ?', whereArgs: [item.id]);
+    Map<String,dynamic> calendarMap = this.toMap();
+    this.id = await db.update(dbTableName, calendarMap, where: 'id = ?', whereArgs: [this.id]);
   }
 
   static Future<List<CalendarItem>> getInitialItems() async {
@@ -84,7 +84,7 @@ class CalendarItem extends FirestoreSynchronized {
     //select * from CalendarItem where date < "2020-06-03T12:00:00.000Z";
     return dbToObjects(result);
   }
-  static Future<CalendarItem> getItemById(int id) async {
+  Future<CalendarItem> getItemById(int id) async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;
     var result = await  db.rawQuery( 'SELECT * FROM CalendarItem WHERE id = ?', [id]);
@@ -148,6 +148,18 @@ class CalendarItem extends FirestoreSynchronized {
       'date':this.date,
       'date_created':this.dateCreated
     };
+  }
+  String getFirestoreId() {
+    return this.firestoreId;
+  }
+  void setFirestoreId(String id) {
+    this.firestoreId = id;
+  }
+  CollectionReference getItemFirestoreCollection(String userId) {
+    return Firestore.instance.collection('users/' + userId + '/calendar_events');
+  }
+  int getId() {
+    return this.id;
   }
 
 }

@@ -27,34 +27,16 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
           item.id = new DateTime.now().millisecondsSinceEpoch;
           item.setName(event.name);
           item.dateCreated = new DateTime.now().toUtc();
-          item = await UnmanagedItem.addUnmanagedItem(item);
-          Firestore.instance.collection('users/' + userId + '/unmanaged_items')
-              .add(item.toFirestoreMap()).then((value) async {
-            UnmanagedItem toBeUpdated = await UnmanagedItem.getItemById(item.id);
-            if (toBeUpdated == null) {
-              //this means the item was both added and deleted while offline
-              value.delete();
-            } else {
-              toBeUpdated.firestoreId = value.documentID;
-              //update in case item was created and updated offline
-              Firestore.instance.collection('users/' + userId + '/unmanaged_items')
-                  .document(toBeUpdated.firestoreId)
-                  .setData(toBeUpdated.toMap());
-              UnmanagedItem.updateItem(toBeUpdated);
-            }
-          });
+          item.addItemToFirestore(userId);
         } else if (event is UpdateItemEvent) {
-          UnmanagedItem.updateItem(event.item);
-          UnmanagedItem item = await UnmanagedItem.getItemById(event.item.id);
-          if (item != null && item.firestoreId != null) {
-            Firestore.instance.collection('users/' + userId + '/unmanaged_items').document(item.firestoreId).updateData({"name": event.item.name});
-          }
+          UnmanagedItem item = await UnmanagedItem().getItemById(event.item.id);
+          item.name = event.item.name;
+          item.updateItemDbFields();
+          item.updateFirestoreData(userId);
         } else if (event is DeleteItemEvent) {
-            UnmanagedItem toBeDeleted = await UnmanagedItem.getItemById(event.id);
-            DatabaseClient().delete(event.id, 'UnmanagedItem');
-            if (toBeDeleted.firestoreId != null) {
-              Firestore.instance.collection('users/' + userId + '/unmanaged_items').document(toBeDeleted.firestoreId).delete();
-            }
+          UnmanagedItem toBeDeleted = await UnmanagedItem().getItemById(event.id);
+          DatabaseClient().delete(event.id, 'UnmanagedItem');
+          toBeDeleted.deleteFirestoreItem(userId);
         }
         UnmanagedItemState state = InitializedUnmanagedItemState();
         await state.initializeItems();

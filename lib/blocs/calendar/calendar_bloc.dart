@@ -58,23 +58,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       item.description =  event.description;
       item.date = event.daySelected;
       item.dateCreated = dateCreated;
-
-      Firestore.instance.collection('users/' + userId + '/calendar_events').add(
-        item.toFirestoreMap()
-      ).then((value) async {
-        CalendarItem toBeUpdated = await CalendarItem.getItemById(item.id);
-        if (toBeUpdated != null) {
-          toBeUpdated.firestoreId = value.documentID;
-          CalendarItem.updateCalendarItemDbFields(toBeUpdated);
-          //in case item was created and modified while offline
-          Firestore.instance.collection('users/' + userId + '/calendar_events').document(value.documentID).setData(toBeUpdated.toFirestoreMap());
-        } else {
-          //this means the item was both added and deleted while offline
-          await value.delete();
-        }
-      });
-
-      CalendarItem.addCalendarItemToDb(item);
+      item.addItemToFirestore(userId);
       addItemToMap(item, _events);
       if (_selectedDay == item.date) {
         _selectedDayEvents = _events[_selectedDay];
@@ -82,11 +66,9 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, event.name, event.description, -1);
       /** DELETE EVENT **/
     } else if (event is DeleteCalendarEvent) {
-      CalendarItem toBeDeleted = await CalendarItem.getItemById(event.item.id);
+      CalendarItem toBeDeleted = await CalendarItem().getItemById(event.item.id);
       await CalendarItem.deleteItem(event.item);
-      if (toBeDeleted.firestoreId != null) {
-        Firestore.instance.collection('users/' + userId + '/calendar_events').document(toBeDeleted.firestoreId).delete();
-      }
+      toBeDeleted.deleteFirestoreItem(userId);
       List dayEvents = _events[event.item.date];
       for (int i=0; i<dayEvents.length; i++) {
         CalendarItem current = dayEvents[i];
@@ -98,11 +80,12 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       /** EDIT EVENT **/
     } else if (event is EditCalendarEvent) {
       CalendarItem item = event.item;
-      CalendarItem toBeUpdated = await CalendarItem.getItemById(event.item.id);
-      if (toBeUpdated.firestoreId != null) {
-        Firestore.instance.collection('users/' + userId + '/calendar_events').document(toBeUpdated.firestoreId).setData(item.toFirestoreMap());
-      }
-      await CalendarItem.updateCalendarItemDbFields(toBeUpdated);
+      CalendarItem toBeUpdated = await CalendarItem().getItemById(event.item.id);
+      toBeUpdated.name = item.name;
+      toBeUpdated.description = item.description;
+      toBeUpdated.date = item.date;
+      toBeUpdated.updateFirestoreData(userId);
+      await toBeUpdated.updateItemDbFields();
       List eventList = _events[item.date];
       for (int i=0; i<eventList.length; i++) {
         CalendarItem current = eventList[i];
@@ -113,7 +96,6 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       }
       yield CalendarStateInitialized(_events, _selectedDayEvents, _selectedDay, _newEventDate, '', '', -1);
     }
-
   }
 
   void addItemToMap(CalendarItem item,  Map<DateTime, List> map) {

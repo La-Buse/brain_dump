@@ -1,5 +1,6 @@
 import 'package:brain_dump/models/db_models/next_actions/next_action_interface.dart';
 import 'package:brain_dump/models/database_client.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:brain_dump/models/firestore_synchronized.dart';
 final  dbTableName = 'NextAction';
@@ -39,13 +40,12 @@ class NextAction extends FirestoreSynchronized implements NextActionInterface {
     return actions;
   }
 
-  static Future<NextAction> editAction(NextAction action) async {
+  Future<void> updateItemDbFields() async {
     Database db = await DatabaseClient().database;
-    db.update('NextAction', action.toMap(), where: 'id = ?', whereArgs: [action.id] );
-    return action;
+    db.update('NextAction', this.toMap(), where: 'id = ?', whereArgs: [this.id] );
   }
 
-  static Future<NextAction> getActionById(int id) async {
+  Future<NextAction> getItemById(int id) async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;
     var result = await  db.rawQuery( 'SELECT * FROM NextAction WHERE id = ?', [id]);
@@ -59,18 +59,11 @@ class NextAction extends FirestoreSynchronized implements NextActionInterface {
   }
 
 
-  static Future<int> addNextActionToDb(NextAction action) async {
+  Future<int> addItemToLocalDb() async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;
-    action.id = await db.insert(dbTableName, action.toMap());
-    return action.id;
-  }
-  static Future<Null> updateNextActionDbFields(NextAction action) async {
-    var dbClass = DatabaseClient();
-    Database db = await dbClass.database;
-    Map<String,dynamic> actionMap = action.toMap();
-
-    action.id = await db.update(dbTableName, actionMap, where: 'id = ?', whereArgs: [action.id]);
+    this.id = await db.insert(dbTableName, this.toMap());
+    return this.id;
   }
 
   static Future<int> deleteNextAction(int id) async {
@@ -131,5 +124,14 @@ class NextAction extends FirestoreSynchronized implements NextActionInterface {
       'date_accomplished': this.dateAccomplished,
       'date_created': this.dateCreated,
     };
+  }
+  String getFirestoreId() {
+    return this.firestoreId;
+  }
+  void setFirestoreId(String id) {
+    this.firestoreId = id;
+  }
+  CollectionReference getItemFirestoreCollection(String userId) {
+    return Firestore.instance.collection('users/' + userId + '/next_actions');
   }
 }

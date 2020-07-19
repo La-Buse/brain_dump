@@ -1,5 +1,6 @@
 import 'package:brain_dump/models/db_models/next_actions/next_action_interface.dart';
 import 'package:brain_dump/models/database_client.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:async/async.dart';
 import 'package:brain_dump/models/firestore_synchronized.dart';
@@ -39,10 +40,10 @@ class NextActionContext extends FirestoreSynchronized implements NextActionInter
     return contexts;
   }
 
-  static Future<int> addActionContext(NextActionContext context) async {
+  Future<int> addItemToLocalDb() async {
     Database db = await DatabaseClient().database;
-    context.id = await db.insert(dbTableName, context.toMap());
-    return context.id;
+    this.id = await db.insert(dbTableName, this.toMap());
+    return this.id;
   }
 
   static Future<int> deleteActionContext(int id) async {
@@ -50,13 +51,13 @@ class NextActionContext extends FirestoreSynchronized implements NextActionInter
     return await db.delete(dbTableName, where: 'id = ?', whereArgs: [id]);
   }
 
-  static Future<NextActionContext> editActionContext(NextActionContext context) async {
+  Future<void> updateItemDbFields() async {
     Database db = await DatabaseClient().database;
-    db.update('NextActionContext', context.toMap(), where: 'id = ?', whereArgs: [context.id] );
-    return context;
+    db.update('NextActionContext', this.toMap(), where: 'id = ?', whereArgs: [this.id] );
+    return this;
   }
 
-  static Future<NextActionContext> getContextById(int id) async {
+  Future<NextActionContext> getItemById(int id) async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;
     var result = await  db.rawQuery( 'SELECT * FROM NextActionContext WHERE id = ?', [id]);
@@ -115,5 +116,14 @@ class NextActionContext extends FirestoreSynchronized implements NextActionInter
       'parent_id': this.parentId,
       'date_created': this.dateCreated,
     };
+  }
+  String getFirestoreId() {
+    return this.firestoreId;
+  }
+  void setFirestoreId(String id) {
+    this.firestoreId = id;
+  }
+  CollectionReference getItemFirestoreCollection(String userId) {
+    return Firestore.instance.collection('users/' + userId + '/next_actions_contexts');
   }
 }

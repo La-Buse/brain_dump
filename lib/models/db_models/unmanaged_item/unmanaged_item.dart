@@ -1,4 +1,5 @@
 import 'package:brain_dump/models/database_client.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:brain_dump/models/firestore_synchronized.dart';
 
@@ -39,19 +40,19 @@ class UnmanagedItem extends FirestoreSynchronized {
     return map;
   }
 
-  static Future<int> updateItem(UnmanagedItem item) async {
+  Future<void> updateItemDbFields() async {
     Database db = await DatabaseClient().database;
-    return db.update('UnmanagedItem', item.toMap(),
-        where: 'id = ?', whereArgs: [item.id]);
+    return db.update('UnmanagedItem', this.toMap(),
+        where: 'id = ?', whereArgs: [this.id]);
   }
 
-  static Future<UnmanagedItem> addUnmanagedItem(UnmanagedItem item) async {
+  Future<int> addItemToLocalDb() async {
     Database myDatabase = await DatabaseClient().database;
-    item.id = await myDatabase.insert('UnmanagedItem', item.toMap());
-    return item;
+    this.id = await myDatabase.insert('UnmanagedItem', this.toMap());
+    return this.id;
   }
 
-  static Future<UnmanagedItem> getItemById(int id) async {
+  Future<UnmanagedItem> getItemById(int id) async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;
     var result = await  db.rawQuery( 'SELECT * FROM UnmanagedItem WHERE id = ?', [id]);
@@ -82,5 +83,17 @@ class UnmanagedItem extends FirestoreSynchronized {
       'id': this.id,
       'date_created': this.dateCreated,
     };
+  }
+  String getFirestoreId() {
+    return this.firestoreId;
+  }
+  void setFirestoreId(String id) {
+    this.firestoreId = id;
+  }
+  CollectionReference getItemFirestoreCollection(String userId) {
+    return Firestore.instance.collection('users/' + userId + '/unmanaged_items');
+  }
+  int getId() {
+    return this.id;
   }
 }
