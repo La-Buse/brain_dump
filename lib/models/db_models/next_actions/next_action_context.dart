@@ -13,6 +13,12 @@ class NextActionContext extends FirestoreSynchronized implements NextActionInter
   DateTime dateCreated;
   String firestoreId;
 
+  String getLocalDbTableName() {
+    return 'NextActionContext';
+  }
+  Future<void> deleteFromLocalDb() async {
+    await DatabaseClient().delete(this.id, this.getLocalDbTableName());
+  }
   String getName() {
     return this.name;
   }
@@ -51,7 +57,7 @@ class NextActionContext extends FirestoreSynchronized implements NextActionInter
     return await db.delete(dbTableName, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<void> updateItemDbFields() async {
+  Future<void> updateItemLocalDbFields() async {
     Database db = await DatabaseClient().database;
     db.update('NextActionContext', this.toMap(), where: 'id = ?', whereArgs: [this.id] );
     return this;
@@ -117,13 +123,51 @@ class NextActionContext extends FirestoreSynchronized implements NextActionInter
       'date_created': this.dateCreated,
     };
   }
+
   String getFirestoreId() {
     return this.firestoreId;
   }
+
   void setFirestoreId(String id) {
     this.firestoreId = id;
   }
+
   CollectionReference getItemFirestoreCollection(String userId) {
     return Firestore.instance.collection('users/' + userId + '/next_actions_contexts');
+  }
+
+  Future<List<FirestoreSynchronized>> readAllLocalItems() async {
+    Database db = await DatabaseClient().database;
+    NextActionContext dummyContext = new NextActionContext();
+    List<Map<String, dynamic>> mapResult;
+    mapResult = await db.rawQuery('SELECT * FROM NextActionContext');
+    List<FirestoreSynchronized> objectResult = new List();
+    for (Map<String,dynamic> currentMap in mapResult) {
+      NextActionContext current = dummyContext.fromMap(currentMap);
+      objectResult.add(current);
+    }
+    return objectResult;
+  }
+
+  Future<List<FirestoreSynchronized>> getAllRemoteItems(String userId) async {
+    QuerySnapshot snapshot = await Firestore.instance.collection('users/' + userId + '/next_actions_contexts').getDocuments();
+    NextActionContext dummyContext = new NextActionContext();
+    List<DocumentSnapshot> snapshots = snapshot.documents;
+    List<FirestoreSynchronized> result = new List();
+    for (DocumentSnapshot currentSnapshot in snapshots) {
+      NextActionContext current = dummyContext.fromFirestoreMap(currentSnapshot.data, currentSnapshot.documentID);
+      result.add(current);
+    }
+    return result;
+  }
+  NextActionContext fromFirestoreMap(Map<String,dynamic> firestoreMap, String documentId) {
+    NextActionContext result = new NextActionContext();
+    result.firestoreId = documentId;
+    result.id = firestoreMap['id'];
+    result.name = firestoreMap['name'];
+    result.parentId = firestoreMap['parent_id'];
+    Timestamp timestamp = firestoreMap['date_created'];
+    result.dateCreated = this.timestampToUtcDateTime(timestamp) ;
+    return result;
   }
 }

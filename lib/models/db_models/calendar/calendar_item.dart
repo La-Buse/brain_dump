@@ -33,6 +33,10 @@ class CalendarItem extends FirestoreSynchronized {
 
   }
 
+  String getLocalDbTableName() {
+    return 'CalendarItem';
+  }
+
   static List<CalendarItem> dbToObjects(List<Map<String, dynamic>> result) {
     List<CalendarItem> calendarItems = [];
     result.forEach((map) {
@@ -41,6 +45,9 @@ class CalendarItem extends FirestoreSynchronized {
       calendarItems.add(calendarItem);
     });
     return calendarItems;
+  }
+  Future<void> deleteFromLocalDb() async {
+    await DatabaseClient().delete(this.id, this.getLocalDbTableName());
   }
 
   Future<int> addItemToLocalDb() async {
@@ -69,7 +76,7 @@ class CalendarItem extends FirestoreSynchronized {
     return await db.delete(dbTableName, where: 'id = ?', whereArgs: [item.id]);
   }
 
-  Future<void> updateItemDbFields() async {
+  Future<void> updateItemLocalDbFields() async {
     var dbClass = DatabaseClient();
     Database db = await dbClass.database;
     Map<String,dynamic> calendarMap = this.toMap();
@@ -161,5 +168,40 @@ class CalendarItem extends FirestoreSynchronized {
   int getId() {
     return this.id;
   }
-
+  //todo : factorize this function for all firestore synchronized items
+  //should take table name as parameter and something to get a dummy object
+  Future<List<FirestoreSynchronized>> readAllLocalItems() async {
+    Database db = await DatabaseClient().database;
+    List<Map<String, dynamic>> mapResult;
+    CalendarItem dummyItem = new CalendarItem();
+    mapResult = await db.rawQuery('SELECT * FROM CalendarItem');
+    List<FirestoreSynchronized> objectResult = new List();
+    for (Map<String,dynamic> currentMap in mapResult) {
+      CalendarItem current = dummyItem.fromMap(currentMap);
+      objectResult.add(current);
+    }
+    return objectResult;
+  }
+  Future<List<FirestoreSynchronized>> getAllRemoteItems(String userId) async {
+    QuerySnapshot snapshot = await Firestore.instance.collection('users/' + userId + '/calendar_items').getDocuments();
+    CalendarItem dummyItem = new CalendarItem();
+    List<DocumentSnapshot> snapshots = snapshot.documents;
+    List<FirestoreSynchronized> result = new List();
+    for (DocumentSnapshot currentSnapshot in snapshots) {
+      CalendarItem current = dummyItem.fromFirestoreMap(currentSnapshot.data, currentSnapshot.documentID);
+      result.add(current);
+    }
+    return result;
+  }
+  CalendarItem fromFirestoreMap(Map<String,dynamic> firestoreMap, String documentId) {
+    CalendarItem result = new CalendarItem();
+    result.firestoreId = documentId;
+    result.id = firestoreMap['id'];
+    result.name = firestoreMap['name'];
+    Timestamp timestamp = firestoreMap['date_created'];
+    result.dateCreated = this.timestampToUtcDateTime(timestamp) ;
+    result.date = firestoreMap['date'];
+    result.description = firestoreMap['description'];
+    return result;
+  }
 }

@@ -80,7 +80,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
     } else if (event is EditContextEvent) {
       NextActionContext toBeUpdated = await NextActionContext().getItemById(event.id);
       toBeUpdated.name = event.contextName;
-      toBeUpdated.updateItemDbFields();
+      toBeUpdated.updateItemLocalDbFields();
       toBeUpdated.updateFirestoreData(userId);
       //modify in memory items
       NextActionContext edited = this.allActions.where((x) {
@@ -91,7 +91,7 @@ class NextActionsBloc extends Bloc<NextActionsEvent, NextActionsState> {
     } else if (event is EditActionEvent) {
       NextAction toBeUpdated = await new NextAction().getItemById(event.id);
       toBeUpdated.name = event.actionName;
-      toBeUpdated.updateItemDbFields();
+      toBeUpdated.updateItemLocalDbFields();
       toBeUpdated.updateFirestoreData(userId);
 
       NextAction edited = this.allActions.where((x) {

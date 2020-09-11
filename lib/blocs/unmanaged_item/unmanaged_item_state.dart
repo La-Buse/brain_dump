@@ -18,7 +18,7 @@ abstract class UnmanagedItemState {
 
   Future<void> initializeItems() async {
     DatabaseClient db = DatabaseClient();
-    List<UnmanagedItem> items = await UnmanagedItem.readUnmanagedItems();
+    List<UnmanagedItem> items = await UnmanagedItem().readAllLocalItems();
     this.items = items;
   }
 }

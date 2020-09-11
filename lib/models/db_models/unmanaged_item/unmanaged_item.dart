@@ -11,6 +11,9 @@ class UnmanagedItem extends FirestoreSynchronized {
 
   UnmanagedItem();
 
+  String getLocalDbTableName() {
+    return 'UnmanagedItem';
+  }
   fromMap(Map<String, dynamic> map) {
     this.id = map['id'];
     this.name = map['name'];
@@ -40,7 +43,7 @@ class UnmanagedItem extends FirestoreSynchronized {
     return map;
   }
 
-  Future<void> updateItemDbFields() async {
+  Future<void> updateItemLocalDbFields() async {
     Database db = await DatabaseClient().database;
     return db.update('UnmanagedItem', this.toMap(),
         where: 'id = ?', whereArgs: [this.id]);
@@ -48,8 +51,11 @@ class UnmanagedItem extends FirestoreSynchronized {
 
   Future<int> addItemToLocalDb() async {
     Database myDatabase = await DatabaseClient().database;
-    this.id = await myDatabase.insert('UnmanagedItem', this.toMap());
+    this.id = await myDatabase.insert(this.getLocalDbTableName(), this.toMap());
     return this.id;
+  }
+  Future<void> deleteFromLocalDb() async {
+    await DatabaseClient().delete(this.id, this.getLocalDbTableName());
   }
 
   Future<UnmanagedItem> getItemById(int id) async {
@@ -65,18 +71,6 @@ class UnmanagedItem extends FirestoreSynchronized {
     return foundItem;
   }
 
-  static Future<List<UnmanagedItem>> readUnmanagedItems() async {
-    Database myDatabase = await DatabaseClient().database;
-    List<Map<String, dynamic>> result =
-    await myDatabase.rawQuery('SELECT * FROM UnmanagedItem');
-    List<UnmanagedItem> items = [];
-    result.forEach((map) {
-      UnmanagedItem item = new UnmanagedItem();
-      item.fromMap(map);
-      items.add(item);
-    });
-    return items;
-  }
   Map<String, dynamic> toFirestoreMap() {
     return {
       'name': this.name,
@@ -95,5 +89,37 @@ class UnmanagedItem extends FirestoreSynchronized {
   }
   int getId() {
     return this.id;
+  }
+  Future<List<FirestoreSynchronized>> readAllLocalItems() async {
+    Database myDatabase = await DatabaseClient().database;
+    List<Map<String, dynamic>> result =
+        await myDatabase.rawQuery('SELECT * FROM UnmanagedItem');
+    List<UnmanagedItem> items = [];
+    result.forEach((map) {
+      UnmanagedItem item = new UnmanagedItem();
+      item.fromMap(map);
+      items.add(item);
+    });
+    return items;
+  }
+  Future<List<FirestoreSynchronized>> getAllRemoteItems(String userId) async {
+    QuerySnapshot snapshot = await Firestore.instance.collection('users/' + userId + '/unmanaged_items').getDocuments();
+    UnmanagedItem dummyItem = new UnmanagedItem();
+    List<DocumentSnapshot> snapshots = snapshot.documents;
+    List<FirestoreSynchronized> result = new List();
+    for (DocumentSnapshot currentSnapshot in snapshots) {
+      UnmanagedItem current = dummyItem.fromFirestoreMap(currentSnapshot.data, currentSnapshot.documentID);
+      result.add(current);
+    }
+    return result;
+  }
+  UnmanagedItem fromFirestoreMap(Map<String,dynamic> firestoreMap, String documentId) {
+    UnmanagedItem result = new UnmanagedItem();
+    result.firestoreId = documentId;
+    result.id = firestoreMap['id'];
+    result.name = firestoreMap['name'];
+    Timestamp timestamp = firestoreMap['date_created'];
+    result.dateCreated = this.timestampToUtcDateTime(timestamp) ;
+    return result;
   }
 }

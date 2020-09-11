@@ -31,7 +31,7 @@ class UnmanagedItemBloc extends Bloc<UnmanagedItemEvent, UnmanagedItemState> {
         } else if (event is UpdateItemEvent) {
           UnmanagedItem item = await UnmanagedItem().getItemById(event.item.id);
           item.name = event.item.name;
-          item.updateItemDbFields();
+          item.updateItemLocalDbFields();
           item.updateFirestoreData(userId);
         } else if (event is DeleteItemEvent) {
           UnmanagedItem toBeDeleted = await UnmanagedItem().getItemById(event.id);

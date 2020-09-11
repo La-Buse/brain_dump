@@ -21,6 +21,7 @@ class _DashboardState extends State<Dashboard> {
     return BlocBuilder(
         bloc: dashboardBloc,
         builder: (BuildContext context, DashboardState state) {
+          //this if case is triggered after user has requested to synch data
           if (state is CloudDataSuccesfullyFetched) {
             Fluttertoast.showToast(
                 msg: "Data succesfully synchronized",

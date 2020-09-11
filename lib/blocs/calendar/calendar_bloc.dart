@@ -85,7 +85,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       toBeUpdated.description = item.description;
       toBeUpdated.date = item.date;
       toBeUpdated.updateFirestoreData(userId);
-      await toBeUpdated.updateItemDbFields();
+      await toBeUpdated.updateItemLocalDbFields();
       List eventList = _events[item.date];
       for (int i=0; i<eventList.length; i++) {
         CalendarItem current = eventList[i];
