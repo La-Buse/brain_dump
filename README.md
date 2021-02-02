@@ -1,16 +1,7 @@
 # brain_dump
 
-A new Flutter application.
+This is application is meant to be a technological implementation of the methodology described in the book Getting Things Done by David Allen.
 
-## Getting Started
+## State
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This project is unfinished.
